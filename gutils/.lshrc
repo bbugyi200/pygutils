@@ -1,0 +1,3 @@
+alias vila='vim __init__.py core.py *.py'
+alias T='pytest tests/*'
+alias viall='vim __init__.py core.py *.py tests/*.py'
