@@ -1,9 +1,23 @@
 """Debugging Utilities"""
 
 import functools
+import logging
+import signal
+import traceback
+from typing import *  # noqa: F401
+from types import *  # noqa: F401
 
 
-def trace(log):
+def sigint_dump() -> None:
+    """Sets up a signal handler for SIGINT that prints the stack trace."""
+    def int_handler(signum: int, frame: FrameType) -> None:
+        import ipdb; ipdb.set_trace()
+        traceback.print_stack(frame)
+
+    signal.signal(signal.SIGINT, int_handler)
+
+
+def trace(log: logging.Logger) -> Callable:
     """ Decorator that prints signature of function calls.
 
     Useful when debugging recursive functions.
@@ -11,9 +25,9 @@ def trace(log):
     Args:
         log: logging.Logger object.
     """
-    def decorator(func):
+    def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             result = func(*args, **kwargs)
 
             pretty_args = ''

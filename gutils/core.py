@@ -9,13 +9,14 @@ import argparse
 import atexit
 import errno
 import inspect
-import os
+import os  # noqa
 import random
+import signal as sig
 import string
 import subprocess as sp
-import sys
-import termios
-import tty
+import sys  # noqa
+from typing import *  # noqa: F401
+from types import *  # noqa: F401
 
 import gutils.g_xdg as xdg
 import gutils.shared as shared
@@ -26,18 +27,17 @@ __all__ = [
     'StillAliveException',
     'create_dir',
     'create_pidfile',
-    'getch',
-    'imsg',
     'mkfifo',
     'notify',
     'secret',
     'shell',
+    'signal',
     'xkey',
     'xtype',
 ]
 
 
-def ArgumentParser(*args, opt_args=[], description=None, **kwargs):
+def ArgumentParser(*args: Any, description: Any = None, **kwargs: Any) -> argparse.ArgumentParser:
     """ Wrapper for argparse.ArgumentParser.
 
     Args:
@@ -54,19 +54,14 @@ def ArgumentParser(*args, opt_args=[], description=None, **kwargs):
         except KeyError:
             pass
 
-    parser = argparse.ArgumentParser(*args,
-                                     description=description,
-                                     **kwargs)
+    parser = argparse.ArgumentParser(*args, description=description, **kwargs)  # type: ignore
     parser.add_argument('-d', '--debug', action='store_true', help='Enable debugging mode.')
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output.')
-    if 'quiet' in opt_args:
-        parser.add_argument('-q', '--quiet', action='store_true',
-                            help='Use with --debug to send debug messages to log file ONLY')
 
     return parser
 
 
-def create_dir(directory):
+def create_dir(directory: str) -> None:
     """ Create directory if it does not already exist.
 
     Args:
@@ -79,7 +74,7 @@ def create_dir(directory):
             raise
 
 
-def create_pidfile():
+def create_pidfile() -> None:
     """ Writes PID to file, which is created if necessary.
 
     Raises:
@@ -102,40 +97,11 @@ def create_pidfile():
     open(PIDFILE, 'w').write(str(pid))
 
 
-def getch(prompt=None):
-    """Reads a single character from stdin.
-
-    Args:
-        prompt (optional): prompt that is presented to user.
-
-    Returns:
-        The single character that was read.
-    """
-    if prompt:
-        sys.stdout.write(prompt)
-
-    sys.stdout.flush()
-
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
-
-
-def imsg(msg):
-    """Gentoo User Message"""
-    print('>>> {}'.format(msg))
-
-
 class GUtilsError(Exception):
     """ Base-class for all exceptions raised by this package. """
 
 
-def mkfifo(FIFO_PATH):
+def mkfifo(FIFO_PATH: str) -> None:
     """ Creates named pipe if it does not already exist.
 
     Args:
@@ -147,7 +113,7 @@ def mkfifo(FIFO_PATH):
         pass
 
 
-def notify(*args, title=None, urgency=None):
+def notify(*args: str, title: str = None, urgency: str = None) -> None:
     """ Sends desktop notification with calling script's name as the notification title.
 
     Args:
@@ -157,7 +123,7 @@ def notify(*args, title=None, urgency=None):
     """
     try:
         assert len(args) > 0, 'No notification message specified.'
-        assert urgency in (None, 'low', 'normal', 'high'), 'Invalid Urgency: {}'.format(urgency)
+        assert urgency in (None, 'low', 'normal', 'critical'), 'Invalid Urgency: {}'.format(urgency)
     except AssertionError as e:
         raise ValueError(str(e))
 
@@ -175,13 +141,13 @@ def notify(*args, title=None, urgency=None):
     sp.check_call(cmd_list)
 
 
-def secret():
+def secret() -> str:
     """Get Secret String for Use with secret.sh Script"""
     secret = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16))
     fp = '/tmp/{}.secret'.format(shared.scriptname(inspect.stack()))
 
     @atexit.register
-    def remove_secret_file():
+    def remove_secret_file() -> None:
         """Exit Handler that Removes Secret File"""
         try:
             os.remove(fp)
@@ -194,23 +160,36 @@ def secret():
     return secret
 
 
-def shell(*cmds):
+def shell(*cmds: str) -> str:
     """Run Shell Command(s)"""
-    sp.check_call('; '.join(cmds), shell=True)
+    out = sp.check_output('; '.join(cmds), shell=True)
+    return out.decode().strip()
+
+
+def signal(*signums: int) -> Callable:
+    """A decorator for registering signal handlers."""
+
+    def _signal(handler: Callable) -> Callable:
+        for signum in signums:
+            sig.signal(signum, handler)
+
+        return handler
+
+    return _signal
 
 
 class StillAliveException(GUtilsError):
     """ Raised when Old Instance of Script is Still Running """
-    def __init__(self, pid):
+    def __init__(self, pid: int):
         self.pid = pid
 
 
-def xkey(key):
+def xkey(key: str) -> None:
     """Wrapper for `xdotool key`"""
     sp.check_call(['xdotool', 'key', key])
 
 
-def xtype(keys, *, delay=None):
+def xtype(keys: str, *, delay: int = None) -> None:
     """Wrapper for `xdotool type`
 
     Args:

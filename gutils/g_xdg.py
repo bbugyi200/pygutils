@@ -3,6 +3,7 @@
 import getpass
 import inspect
 import os
+from pathlib import Path
 
 import gutils.shared as shared
 import gutils
@@ -15,7 +16,7 @@ _xdg_vals = {'config': ('XDG_CONFIG_HOME', '/home/{}/.config'),
              'cache': ('XDG_CACHE_HOME', '/home/{}/.cache')}
 
 
-def init(userdir, stack=None):
+def init(userdir: str, stack: shared.StackType = None) -> Path:
     """ Get XDG User Directory.
 
     Args:
@@ -34,10 +35,10 @@ def init(userdir, stack=None):
     full_xdg_dir = '{}/{}'.format(get(userdir), scriptname)
     gutils.create_dir(full_xdg_dir)
 
-    return full_xdg_dir
+    return Path(full_xdg_dir)
 
 
-def get(userdir):
+def get(userdir: str) -> Path:
     userdir = userdir.lower()
     userdir_opts = {'config', 'data', 'runtime', 'cache'}
     if userdir not in userdir_opts:
@@ -49,7 +50,7 @@ def get(userdir):
     return xdg_dir
 
 
-def _get(envvar, dirfmt):
+def _get(envvar: str, dirfmt: str) -> Path:
     if envvar in os.environ:
         xdg_dir = os.environ[envvar]
     else:
@@ -58,4 +59,4 @@ def _get(envvar, dirfmt):
         else:
             xdg_dir = dirfmt.format(_user)
 
-    return xdg_dir
+    return Path(xdg_dir)
