@@ -30,9 +30,9 @@ def getch(prompt: str = None) -> str:
 
 def emsg(msg: str) -> None:
     """ERROR Message"""
-    print('[ERROR] {}'.format(msg))
+    print("[ERROR] {}".format(msg))
 
 
 def imsg(msg: str) -> None:
     """INFO Message"""
-    print('>>> {}'.format(msg))
+    print(">>> {}".format(msg))

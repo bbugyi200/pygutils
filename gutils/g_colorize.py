@@ -6,7 +6,8 @@ from types import *  # noqa: F401
 
 def _colorizer_factory(N: int) -> Callable[[str], str]:
     def colorizer(msg: str) -> str:
-        return '%s%s%s' % ('\033[{}m'.format(N), msg, '\033[0m')
+        return "%s%s%s" % ("\033[{}m".format(N), msg, "\033[0m")
+
     return colorizer
 
 
