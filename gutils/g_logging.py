@@ -1,153 +1,119 @@
 """Automates Logging Initialization"""
 
-import contextlib
+import functools
 import inspect
-import logging
+import os
+import sys
 import types
-from typing import *  # noqa: F401
-from types import *  # noqa: F401
+from typing import (  # noqa: F401
+    Any,
+    Callable,
+    Container,
+    Dict,
+    Generator,
+    Iterable,
+    Iterator,
+    List,
+    NoReturn,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypeVar,
+    Union,
+)
+
+from loguru import logger as log
 
 
-def getEasyLogger(name: str) -> logging.Logger:
-    """Initializes Log Handlers
+def configure(_name: str, *, debug: bool, verbose: bool) -> None:
+    """Configure the Logger."""
+    # In case __file__ is used...
+    name = os.path.basename(_name).replace('.py', '')
 
-    Args:
-        name: name of the logger to create and return.
-    """
-    log = logging.getLogger(name)
-    _add_vdebug_level()
+    def sformat(report) -> str:
+        fmt_list = _formatter(report, verbose=False)
+        return "".join(fmt_list)
 
-    log.setLevel(logging.VDEBUG)  # type: ignore
+    def fformat(report) -> str:
+        fmt_list = _formatter(report, verbose=True)
+        return "".join(fmt_list)
 
-    formatter = _getFormatter(frame=inspect.stack()[1].frame)
-
-    sh = logging.StreamHandler()
-    sh.setFormatter(formatter)
-    sh.setLevel(logging.INFO)
-
-    log_file = f"/var/tmp/{name}.log"
-    fh = logging.FileHandler(log_file)
-    fh.setFormatter(
-        _getFormatter(frame=inspect.stack()[1].frame, verbose=True)
+    stream_h = dict(
+        sink=sys.stderr,
+        format=sformat,
+        filter=lambda record: "quiet" not in record["extra"]
     )
-    fh.setLevel(logging.DEBUG)
+    file_h = dict(
+        sink=f"/var/tmp/{name}.log",
+        format=fformat,
+        rotation="1 day"
+    )
 
-    log.addHandler(fh)
-    log.addHandler(sh)
+    if debug and verbose:
+        stream_h["level"] = file_h["level"] = "TRACE"
+    elif debug and not verbose:
+        stream_h["level"] = file_h["level"] = "DEBUG"
+    else:
+        stream_h["level"] = "INFO"
+        file_h["level"] = "DEBUG"
 
-    return log
+    log.configure(handlers=[stream_h, file_h])
 
+def _formatter(report, *, verbose: bool = False) -> List[str]:
+    fmt_list: List[str] = []
+    add_field = functools.partial(_add_field, fmt_list)
 
-def _add_vdebug_level() -> None:
-    """Adds custom logging level for verbose debug logs."""
-    VDEBUG_LEVEL_NUM = 5
-    logging.addLevelName(VDEBUG_LEVEL_NUM, "VDEBUG")
-
-    def vdebug(self: Type, message: str, *args: Any, **kwargs: Any) -> None:
-        if self.isEnabledFor(VDEBUG_LEVEL_NUM):
-            self._log(VDEBUG_LEVEL_NUM, message, args, **kwargs)
-
-    logging.Logger.vdebug = vdebug  # type: ignore
-    logging.VDEBUG = VDEBUG_LEVEL_NUM  # type: ignore
-
-
-def _getFormatter(
-    *, frame: FrameType = None, verbose: bool = False
-) -> logging.Formatter:
-    """Get log formatter.
-
-    Args:
-        frame (optional): frame obect (see inspect module).
-        verbose: True if a more verbose log format is desired.
-
-    Returns:
-        logging.Formatter object.
-    """
-    if frame is None:
-        frame = inspect.stack()[1].frame
-
-    base_formatting = _get_log_fmt(frame)
-
+    DATE_STYLE = ["fg #afd787"]
     if verbose:
-        formatter = logging.Formatter(
-            "(%(asctime)s) {}".format(base_formatting),
-            datefmt="%Y-%m-%d %H:%M:%S",
-        )
+        add_field("{time:YYYY-MM-DD}", DATE_STYLE)
+        add_field("{time:HH:mm:ss}", DATE_STYLE)
     else:
-        formatter = logging.Formatter(base_formatting)
+        _minutes, _seconds = divmod(report['elapsed'].seconds, 60)
+        _milliseconds = report['elapsed'].microseconds // 1000
+        _my_elapsed = f"{_minutes:02}:{_seconds:02}.{_milliseconds:03}"
+        add_field(f"{_my_elapsed}", DATE_STYLE)
 
-    return formatter
+    _level = f"[{report['level']}]"
+    add_field(f"{_level:^7}", ["level"])
 
+    if _has_threading(inspect.stack()[2].frame):
+        add_field("{thread.name:^10}", ["fg #ffffaf"])
 
-@contextlib.contextmanager
-def context(
-    log: logging.Logger,
-    *,
-    debug: bool = False,
-    verbose: bool = False,
-) -> Generator:
-    """Exception handling context manager.
+    _process = f"PID:{report['process']}"
+    add_field(f"{_process:^9}", ["fg #d78700"])
 
-    Logs any exceptions that are thrown. Allows the reuse of common exception
-    handling logic.
-    """
-    if debug:
-        # must slice stack ([1:]) to cut off contextlib module
-        _enableDebugMode(log, verbose=verbose)
+    _loc = f"{report['file']}::{report['function']}::{report['line']}"
+    _max_loc_length = max(
+        len(_loc),
+        getattr(configure, 'max_loc_length', 0),
+    ); setattr(configure, 'max_loc_length', _max_loc_length)
+    _loc_fmt = "{{loc:^{0}}}".format(_max_loc_length)
+    loc = _loc_fmt.format(loc=_loc.replace('<', '\\<'))
+    add_field(loc, ["white", "bold"])
 
-    try:
-        yield
-    except Exception as e:
-        log.exception(f'{type(e).__name__}: {str(e)}')
-        raise
+    add_field("{message}", ["level"], sep="")
 
+    fmt_list.append("\n{exception}")
 
-def _enableDebugMode(log: logging.Logger, *, verbose: bool) -> None:
-    """Enables debug mode.
-
-    Adds a FileHandler. Sets the logging level of this handler and any
-    existing StreamHandlers to DEBUG.
-    """
-
-    level = logging.VDEBUG if verbose else logging.DEBUG  # type: ignore
-
-    for handler in log.handlers:
-        if not isinstance(handler, logging.StreamHandler):
-            handler.setLevel(level)
-
-    # return early if a FileHandler already exists
-    for handler in log.handlers:
-        if isinstance(handler, logging.FileHandler):
-            handler.setLevel(level)
-            return
-
-    log.debug("Debugging mode enabled.")
+    return fmt_list
 
 
-def _get_log_fmt(frame: FrameType) -> str:
-    """Get Logging Format String
-
-    Returns a log formatting string, which can be used as the first argument to
-    the logging.Formatter constructor.
-
-    Args:
-        frame: frame object (see inspect module).
-    """
-    fmt = (
-        "[%(levelname)s] <%(process)s{}> "
-        "(%(filename)s:%(funcName)s:%(lineno)d) %(message)s"
+def _add_field(
+        fmt_list: List[str],
+        field: str,
+        marks: List[str],
+        sep: str =" | "
+) -> None:
+    fmt_list.append(
+        f"{''.join(['<' + m + '>' for m in marks])}"
+        f"{field}"
+        f"{''.join(['</>' for _ in marks])}"
+        f"{sep}"
     )
 
-    basic_formatting = fmt.format("")
-    thread_formatting = fmt.format(":%(threadName)s")
 
-    if _has_threading(frame):
-        return thread_formatting
-    else:
-        return basic_formatting
-
-
-def _has_threading(frame: FrameType) -> bool:
+def _has_threading(frame: types.FrameType) -> bool:
     """
     Determines whether or not the given frame has the 'threading' module in
     scope.

@@ -32,6 +32,8 @@ from typing import (  # noqa
     Union,
 )
 
+from loguru import logger as log
+
 import gutils.g_colorize as colorize  # noqa: F401
 import gutils.g_debug as debug  # noqa: F401
 import gutils.g_io as io  # noqa: F401
@@ -63,6 +65,14 @@ def ArgumentParser(
 
     return parser
 
+
+def catch(func: Callable) -> Callable:
+    """Wrapper for loguru.logger.catch"""
+    catcher = log.bind(quiet=True)
+    return catcher.catch(
+        message="An unhandled exception was raised.",
+        reraise=True
+    )(func)
 
 def create_dir(directory: str) -> None:
     """ Create directory if it does not already exist.
