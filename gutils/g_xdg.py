@@ -1,19 +1,17 @@
 """XDG Utilities"""
 
-import getpass
 import inspect
 import os
 from pathlib import Path
 
 import gutils.shared as shared
 
-_user = getpass.getuser()
-
+_home = os.environ.get('HOME')
 _xdg_vals = {
-    "config": ("XDG_CONFIG_HOME", "/home/{}/.config"),
-    "data": ("XDG_DATA_HOME", "/home/{}/.local/share"),
+    "config": ("XDG_CONFIG_HOME", f"{_home}/.config"),
+    "data": ("XDG_DATA_HOME", f"{_home}/.local/share"),
     "runtime": ("XDG_RUNTIME_DIR", "/tmp"),
-    "cache": ("XDG_CACHE_HOME", "/home/{}/.cache"),
+    "cache": ("XDG_CACHE_HOME", f"{_home}/.cache"),
 }
 
 
@@ -53,13 +51,10 @@ def get(userdir: str) -> Path:
     return xdg_dir
 
 
-def _get(envvar: str, dirfmt: str) -> Path:
+def _get(envvar: str, default_dir: str) -> Path:
     if envvar in os.environ:
         xdg_dir = os.environ[envvar]
     else:
-        if "{}" not in dirfmt:
-            xdg_dir = dirfmt
-        else:
-            xdg_dir = dirfmt.format(_user)
+        xdg_dir = default_dir
 
     return Path(xdg_dir)

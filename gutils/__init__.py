@@ -70,9 +70,10 @@ def catch(func: Callable) -> Callable:
     """Wrapper for loguru.logger.catch"""
     catcher = log.bind(quiet=True)
     return catcher.catch(
-        message="An unhandled exception was raised.",
+        message="{record[exception].type.__name__}",
         reraise=True
     )(func)
+
 
 def create_dir(directory: str) -> None:
     """ Create directory if it does not already exist.

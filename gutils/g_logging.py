@@ -103,7 +103,7 @@ def _add_field(
         fmt_list: List[str],
         field: str,
         marks: List[str],
-        sep: str =" | "
+        sep: str = " | "
 ) -> None:
     fmt_list.append(
         f"{''.join(['<' + m + '>' for m in marks])}"
