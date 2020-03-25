@@ -60,6 +60,7 @@ def configure(_name: str, *, debug: bool, verbose: bool) -> None:
 
     log.configure(handlers=[stream_h, file_h])
 
+
 def _formatter(report, *, verbose: bool = False) -> List[str]:
     fmt_list: List[str] = []
     add_field = functools.partial(_add_field, fmt_list)

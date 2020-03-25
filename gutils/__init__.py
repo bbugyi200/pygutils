@@ -76,7 +76,7 @@ def catch(func: Callable) -> Callable:
 
 
 def create_dir(directory: str) -> None:
-    """ Create directory if it does not already exist.
+    """Create directory if it does not already exist.
 
     Args:
         directory: full directory path.
@@ -89,7 +89,7 @@ def create_dir(directory: str) -> None:
 
 
 def create_pidfile() -> None:
-    """ Writes PID to file, which is created if necessary.
+    """Writes PID to file, which is created if necessary.
 
     Raises:
         StillAliveException: if old instance of script is still alive.
@@ -112,11 +112,11 @@ def create_pidfile() -> None:
 
 
 class GUtilsError(Exception):
-    """ Base-class for all exceptions raised by this package. """
+    """Base-class for all exceptions raised by this package."""
 
 
 def mkfifo(FIFO_PATH: str) -> None:
-    """ Creates named pipe if it does not already exist.
+    """Creates named pipe if it does not already exist.
 
     Args:
         FIFO_PATH (str): the full file path where the named pipe will be
@@ -139,7 +139,7 @@ def notify(*args: str, title: str = None, urgency: str = None) -> None:
         urgency (opt): Notification urgency.
     """
     try:
-        assert len(args) > 0, "No notification message specified."
+        assert args, "No notification message specified."
         assert urgency in (
             None,
             "low",
@@ -165,13 +165,13 @@ def notify(*args: str, title: str = None, urgency: str = None) -> None:
 
 def secret() -> str:
     """Get Secret String for Use with secret.sh Script"""
-    secret = "".join(
+    secret_key = "".join(
         random.choice(string.ascii_letters + string.digits) for _ in range(16)
     )
     fp = "/tmp/{}.secret".format(shared.scriptname(inspect.stack()))
 
     @atexit.register
-    def remove_secret_file() -> None:
+    def remove_secret_file() -> None:  # pylint: disable=unused-variable
         """Exit Handler that Removes Secret File"""
         try:
             os.remove(fp)
@@ -179,9 +179,9 @@ def secret() -> str:
             pass
 
     with open(fp, "w") as f:
-        f.write(secret)
+        f.write(secret_key)
 
-    return secret
+    return secret_key
 
 
 def shell(*cmds: str) -> str:
@@ -203,7 +203,7 @@ def signal(*signums: int) -> Callable:
 
 
 class StillAliveException(GUtilsError):
-    """ Raised when Old Instance of Script is Still Running """
+    """Raised when Old Instance of Script is Still Running"""
 
     def __init__(self, pid: int):
         self.pid = pid
