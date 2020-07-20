@@ -1,9 +1,9 @@
 """The setup script."""
 
-import setuptools
+from distutils.core import setup
 
 
-setuptools.setup(
+setup(
     author="Bryan M Bugyi",
     author_email='bryanbugyi34@gmail.com',
     install_requires=['loguru'],
@@ -18,7 +18,7 @@ setuptools.setup(
     license="MIT license",
     keywords='gutils',
     name='bbugyi-pygutils',
-    packages=setuptools.find_packages(),
+    packages=["gutils"],
     test_suite='tests',
     tests_require=['pytest'],
     url='https://github.com/bbugyi200/pygutils',
