@@ -23,5 +23,4 @@ setuptools.setup(
     tests_require=['pytest'],
     url='https://github.com/bbugyi200/pygutils',
     version='1.0.0',
-    zip_safe=False,
 )
