@@ -4,8 +4,8 @@ import functools
 import logging
 import signal
 import traceback
-from typing import *  # noqa: F401
 from types import *  # noqa: F401
+from typing import *  # noqa: F401
 
 
 def sigint_dump() -> None:

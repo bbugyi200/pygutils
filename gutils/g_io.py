@@ -1,5 +1,4 @@
-import os  # noqa
-import sys  # noqa
+import sys
 import termios
 import tty
 
