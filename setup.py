@@ -18,6 +18,7 @@ setup(
     license="MIT license",
     keywords='gutils',
     name='bbugyi-pygutils',
+    package_data={"gutils": ["py.typed"]},
     packages=["gutils"],
     test_suite='tests',
     tests_require=['pytest'],
