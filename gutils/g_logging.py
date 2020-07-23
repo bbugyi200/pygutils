@@ -5,23 +5,7 @@ import inspect
 import os
 import sys
 import types
-from typing import (  # noqa: F401
-    Any,
-    Callable,
-    Container,
-    Dict,
-    Generator,
-    Iterable,
-    Iterator,
-    List,
-    NoReturn,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import List, Mapping
 
 from loguru import logger as log
 
@@ -31,11 +15,11 @@ def configure(_name: str, *, debug: bool, verbose: bool) -> None:
     # In case __file__ is used...
     name = os.path.basename(_name).replace('.py', '')
 
-    def sformat(report) -> str:
+    def sformat(report: Mapping) -> str:
         fmt_list = _formatter(report, verbose=False)
         return "".join(fmt_list)
 
-    def fformat(report) -> str:
+    def fformat(report: Mapping) -> str:
         fmt_list = _formatter(report, verbose=True)
         return "".join(fmt_list)
 
@@ -61,7 +45,7 @@ def configure(_name: str, *, debug: bool, verbose: bool) -> None:
     log.configure(handlers=[stream_h, file_h])
 
 
-def _formatter(report, *, verbose: bool = False) -> List[str]:
+def _formatter(report: Mapping, *, verbose: bool = False) -> List[str]:
     fmt_list: List[str] = []
     add_field = functools.partial(_add_field, fmt_list)
 

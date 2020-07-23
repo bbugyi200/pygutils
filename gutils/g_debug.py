@@ -4,15 +4,15 @@ import functools
 import logging
 import signal
 import traceback
-from types import *  # noqa: F401
-from typing import *  # noqa: F401
+from types import FrameType
+from typing import Any, Callable
 
 
 def sigint_dump() -> None:
     """Sets up a signal handler for SIGINT that prints the stack trace."""
 
-    def int_handler(signum: int, frame: FrameType) -> None:
-        import ipdb
+    def int_handler(_signum: int, frame: FrameType) -> None:
+        import ipdb  # type: ignore
 
         ipdb.set_trace()
         traceback.print_stack(frame)

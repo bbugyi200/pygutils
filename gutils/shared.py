@@ -1,14 +1,11 @@
 """Internal Shared Utilities for gutils Package"""
 
 import inspect
-import os  # noqa: F401
 from pathlib import Path
-from typing import *  # noqa: F401
-from types import *  # noqa: F401
+from typing import List
 
-# ----- Type Aliases -----
+
 StackType = List[inspect.FrameInfo]
-# ------------------------
 
 
 def scriptname(stack: StackType) -> str:

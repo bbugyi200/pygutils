@@ -8,37 +8,20 @@ import argparse
 import atexit
 import errno
 import inspect
-import os  # noqa
+import os
 import random
 import signal as sig
 import string
 import subprocess as sp
-import sys  # noqa
-from typing import (  # noqa
-    Any,
-    Callable,
-    Container,
-    Dict,
-    Generator,
-    Iterable,
-    Iterator,
-    List,
-    NoReturn,
-    Optional,
-    Sequence,
-    Set,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable
 
 from loguru import logger as log
 
-import gutils.g_colorize as colorize  # noqa: F401
-import gutils.g_debug as debug  # noqa: F401
-import gutils.g_io as io  # noqa: F401
-import gutils.g_logging as logging  # noqa: F401
-import gutils.g_xdg as xdg  # noqa: F401
+import gutils.g_colorize as colorize
+import gutils.g_debug as debug
+import gutils.g_io as io
+import gutils.g_logging as logging
+import gutils.g_xdg as xdg
 import gutils.shared as shared
 
 

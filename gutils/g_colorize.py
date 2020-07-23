@@ -1,7 +1,6 @@
 """Return Colorized Strings using ASCII Color Escape Codes"""
 
-from typing import *  # noqa: F401
-from types import *  # noqa: F401
+from typing import Callable
 
 
 def _colorizer_factory(N: int) -> Callable[[str], str]:
