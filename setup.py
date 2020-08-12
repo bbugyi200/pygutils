@@ -23,5 +23,5 @@ setup(
     test_suite='tests',
     tests_require=['pytest'],
     url='https://github.com/bbugyi200/pygutils',
-    version='1.0.0',
+    version='1.1.0',
 )
