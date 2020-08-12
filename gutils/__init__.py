@@ -17,11 +17,11 @@ from typing import Any, Callable
 
 from loguru import logger as log
 
-import gutils.g_colorize as colorize
-import gutils.g_debug as debug
-import gutils.g_io as io
-import gutils.g_logging as logging
-import gutils.g_xdg as xdg
+import gutils.colorize as colorize
+import gutils.debug as debug
+import gutils.io as io
+import gutils.logging as logging
+import gutils.xdg as xdg
 import gutils.shared as shared
 
 
