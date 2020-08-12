@@ -27,7 +27,7 @@ class Err(Generic[_E]):
 Result = Union[Ok[_T], Err[_E]]
 
 
-def InitErrHelper(Error: Type[_E]) -> Callable[[str], Err[_E]]:
+def init_err_helper(Error: Type[_E]) -> Callable[[str], Err[_E]]:
     """
     Factory function which can be used to initialize a helper function for
     returning Err types.
