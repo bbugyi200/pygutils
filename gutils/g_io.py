@@ -1,6 +1,7 @@
 import sys
 import termios
 import tty
+from typing import Any
 
 
 def getch(prompt: str = None) -> str:
@@ -35,3 +36,8 @@ def emsg(msg: str) -> None:
 def imsg(msg: str) -> None:
     """INFO Message"""
     print(">>> {}".format(msg))
+
+
+def eprint(*args: Any, **kwargs: Any) -> None:
+    """Helper function for printing to STDERR."""
+    print(*args, file=sys.stderr, **kwargs)
