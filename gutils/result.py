@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Union
+from typing import Callable, Generic, Type, TypeVar, Union
 
 
 _T = TypeVar("_T")
@@ -25,3 +25,15 @@ class Err(Generic[_E]):
 # influenced by that used by the Rust programming language
 # (see https://doc.rust-lang.org/book/ch09-00-error-handling.html).
 Result = Union[Ok[_T], Err[_E]]
+
+
+def InitErrHelper(Error: Type[_E]) -> Callable[[str], Err[_E]]:
+    """
+    Factory function which can be used to initialize a helper function for
+    returning Err types.
+    """
+    def ErrHelper(emsg: str) -> Err[_E]:
+        e = Error(emsg)
+        return Err(e)
+
+    return ErrHelper
