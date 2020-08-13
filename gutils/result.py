@@ -1,4 +1,6 @@
-from typing import Callable, Generic, Type, TypeVar, Union
+from typing import Any, Generic, Type, TypeVar, Union
+
+from typing_extensions import Protocol
 
 
 _T = TypeVar("_T")
@@ -27,13 +29,19 @@ class Err(Generic[_E]):
 Result = Union[Ok[_T], Err[_E]]
 
 
-def init_err_helper(Error: Type[_E]) -> Callable[[str], Err[_E]]:
+class _ErrHelper(Protocol[_E]):
+    def __call__(self, *args: Any) -> Err[_E]:
+        pass
+
+
+def init_err_helper(Error: Type[_E]) -> _ErrHelper[_E]:
     """
     Factory function which can be used to initialize a helper function for
     returning Err types.
     """
-    def ErrHelper(emsg: str) -> Err[_E]:
-        e = Error(emsg)
+
+    def err_helper(*args: Any) -> Err[_E]:
+        e = Error(*args)
         return Err(e)
 
-    return ErrHelper
+    return err_helper
