@@ -75,7 +75,7 @@ def _formatter(report: Mapping, *, verbose: bool = False) -> List[str]:
     ); setattr(configure, 'max_loc_length', _max_loc_length)
     _loc_fmt = "{{loc:^{0}}}".format(_max_loc_length)
     loc = _loc_fmt.format(loc=_loc.replace('<', '\\<'))
-    add_field(loc, ["white", "bold"])
+    add_field(loc, ["black", "bold"])
 
     add_field("{message}", ["level"], sep="")
 
