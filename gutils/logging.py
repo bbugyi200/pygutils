@@ -52,8 +52,7 @@ def _formatter(report: Mapping, *, verbose: bool = False) -> List[str]:
 
     DATE_STYLE = ["fg #afd787"]
     if verbose:
-        add_field("{time:YYYY-MM-DD}", DATE_STYLE)
-        add_field("{time:HH:mm:ss}", DATE_STYLE)
+        add_field("{time:YYYY-MM-DD HH:mm:ss}", DATE_STYLE)
     else:
         _minutes, _seconds = divmod(report['elapsed'].seconds, 60)
         _milliseconds = report['elapsed'].microseconds // 1000
