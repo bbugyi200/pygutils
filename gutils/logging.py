@@ -16,7 +16,8 @@ def configure(_name: str, *, debug: bool, verbose: bool) -> None:
     name = os.path.basename(_name).replace('.py', '')
 
     def sformat(report: Mapping) -> str:
-        fmt_list = _formatter(report, verbose=False)
+        verbose = bool("SUPERVISOR_ENABLED" in os.environ)
+        fmt_list = _formatter(report, verbose=verbose)
         return "".join(fmt_list)
 
     def fformat(report: Mapping) -> str:
