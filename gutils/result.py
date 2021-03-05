@@ -1,4 +1,4 @@
-from typing import Any, Generic, Type, TypeVar, Union
+from typing import Any, Generic, NoReturn, Type, TypeVar, Union
 
 from typing_extensions import Protocol
 
@@ -14,6 +14,9 @@ class Ok(Generic[_T]):
     def ok(self) -> _T:
         return self._value
 
+    def unwrap(self) -> _T:
+        return self.ok()
+
 
 class Err(Generic[_E]):
     def __init__(self, e: _E) -> None:
@@ -21,6 +24,9 @@ class Err(Generic[_E]):
 
     def err(self) -> _E:
         return self._e
+
+    def unwrap(self) -> NoReturn:
+        raise self.err()
 
 
 # The 'Result' return type is used to implement an error-handling model heavily
