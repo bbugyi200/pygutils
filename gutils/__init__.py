@@ -9,11 +9,14 @@ import atexit
 import errno
 import inspect
 import os
+from os.path import abspath, isfile, realpath
 import random
 import signal as sig
 import string
 import subprocess as sp
-from typing import Any, Callable
+import sys
+from textwrap import wrap
+from typing import Any, Callable, Iterator
 
 from loguru import logger as log
 
@@ -21,8 +24,8 @@ import gutils.colorize as colorize
 import gutils.debug as debug
 import gutils.io as io
 import gutils.logging as logging
-import gutils.xdg as xdg
 import gutils.shared as shared
+import gutils.xdg as xdg
 
 
 def ArgumentParser(
@@ -130,7 +133,7 @@ def notify(*args: str, title: str = None, urgency: str = None) -> None:
             "critical",
         ), "Invalid Urgency: {}".format(urgency)
     except AssertionError as e:
-        raise ValueError(str(e))
+        raise ValueError(str(e)) from e
 
     if title is None:
         title = shared.scriptname(inspect.stack())
@@ -210,3 +213,74 @@ def xtype(keys: str, *, delay: int = None) -> None:
     keys = keys.strip("\n")
 
     sp.check_call(["xdotool", "type", "--delay", str(delay), keys])
+
+
+def cname(obj):
+    # type: (object) -> str
+    """Helper function for getting an object's class name as a string."""
+    return obj.__class__.__name__
+
+
+def ewrap(multiline_msg, width=80, indent=0):
+    # type: (str, int, int) -> Iterator[str]
+    """A better version of textwrap.wrap()."""
+    for msg in multiline_msg.split("\n"):
+        if not msg:
+            yield ""
+            continue
+
+        msg = (" " * indent) + msg
+
+        i = 0
+        while i < len(msg) and msg[i] == " ":
+            i += 1
+
+        spaces = " " * i
+        for m in wrap(
+            msg, width, subsequent_indent=spaces, drop_whitespace=True
+        ):
+            yield m
+
+
+def efill(multiline_msg, width=80, indent=0):
+    # type: (str, int, int) -> str
+    """A better version of textwrap.fill()."""
+    return "\n".join(ewrap(multiline_msg, width, indent))
+
+
+class Inspector:
+    """
+    Helper class for python introspection (e.g. What line number is this?)
+    """
+
+    def __init__(self, up=0):
+        # type: (int) -> None
+        stack = inspect.stack()[up + 1]
+
+        self.module_name = path_to_module(stack[1])
+        self.file_name = stack[1]
+        self.line_number = stack[2]
+        self.function_name = stack[3]
+        self.lines = ''.join(stack[4] or [])
+
+
+def path_to_module(path):
+    # type: (str) -> str
+    P = path
+
+    # HACK: Improves the (still broken) output in some weird cases where
+    # python gets confused about paths.
+    real_abs_P = realpath(abspath(P))
+    if isfile(real_abs_P):
+        P = real_abs_P
+
+    if P.endswith((".py", ".px")):
+        P = P[:-3]
+
+    sorted_pypaths = sorted(sys.path, key=lambda x: -len(x))
+    for pypath in sorted_pypaths:
+        pypath = realpath(pypath)
+        P = P.replace(pypath + "/", "")
+
+    P = P.replace("/", ".")
+    return P
