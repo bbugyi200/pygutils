@@ -77,10 +77,9 @@ class DoneProcess:
             maybe_err = "\n\n----- STDERR\n{}".format(self.err)
 
         return BErr(
-            "Command Failed: %r%s%s",
-            self.cmd_list,
-            maybe_out,
-            maybe_err,
+            "Command Failed: {!r}{}{}".format(
+                self.cmd_list, maybe_out, maybe_err
+            ),
             up=up + 1,
         )
 

@@ -1,6 +1,5 @@
-import subprocess as sp
 import sys
-from typing import Iterable, Iterator, NamedTuple
+from typing import Iterable, List, NamedTuple
 
 from gutils import subprocess as bsp
 from gutils.errors import BResult, Err, Ok
@@ -26,22 +25,25 @@ def top_level_dir(cwd=None):
 
 
 def remotes():
-    # type: () -> Iterator[GitRemote]
+    # type: () -> BResult[List[GitRemote]]
     """Python wrapper around the `git remote -v` command."""
-    ps = sp.Popen(["git", "remote", "-v"], stdout=sp.PIPE)
-    stdout, _stderr = ps.communicate()
-    out = stdout.decode().strip()
+    out_err_r = bsp.safe_popen(["git", "remote", "-v"])
+    if isinstance(out_err_r, Err):
+        return out_err_r
 
-    remote_set = set()
+    out, _err = out_err_r.ok()
+
+    all_remotes = []
     for line in out.split("\n"):
         line_split = line.split()
         if len(line_split) < 2:
             continue
 
         remote = GitRemote(str(line_split[0]), str(line_split[1]))
-        if remote not in remote_set:
-            remote_set.add(remote)
-            yield remote
+        if remote not in all_remotes:
+            all_remotes.append(remote)
+
+    return Ok(all_remotes)
 
 
 def local_branch_exists(branch):

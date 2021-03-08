@@ -39,7 +39,7 @@ class Err(Generic[_E]):
         self._e = e
 
     def __repr__(self) -> str:
-        return f"{cname(self)}({self.err()})"
+        return f"{cname(self)}(\n{efill(str(self.err()), indent=2)}\n)"
 
     def err(self) -> _E:
         return self._e
