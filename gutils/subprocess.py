@@ -107,11 +107,7 @@ def create_pidfile() -> None:
     open(PIDFILE, "w").write(str(pid))
 
 
-class GUtilsError(Exception):
-    """Base-class for all exceptions raised by this package."""
-
-
-class StillAliveException(GUtilsError):
+class StillAliveException(Exception):
     """Raised when Old Instance of Script is Still Running"""
 
     def __init__(self, pid: int):
