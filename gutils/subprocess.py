@@ -1,6 +1,9 @@
+import inspect
+import os
 import subprocess as sp
 from typing import Any, Iterable, List, Tuple
 
+from gutils import xdg
 from gutils.errors import BErr, BResult, BugyiError, Err, Ok
 
 
@@ -80,3 +83,37 @@ class DoneProcess:
             maybe_err,
             up=up + 1,
         )
+
+
+def create_pidfile() -> None:
+    """Writes PID to file, which is created if necessary.
+
+    Raises:
+        StillAliveException: if old instance of script is still alive.
+    """
+    PIDFILE = "{}/pid".format(xdg.init("runtime", stack=inspect.stack()))
+    if os.path.isfile(PIDFILE):
+        old_pid = int(open(PIDFILE, "r").read())
+        try:
+            os.kill(old_pid, 0)
+        except OSError:
+            pass
+        except ValueError:
+            if old_pid != "":
+                raise
+        else:
+            raise StillAliveException(old_pid)
+
+    pid = os.getpid()
+    open(PIDFILE, "w").write(str(pid))
+
+
+class GUtilsError(Exception):
+    """Base-class for all exceptions raised by this package."""
+
+
+class StillAliveException(GUtilsError):
+    """Raised when Old Instance of Script is Still Running"""
+
+    def __init__(self, pid: int):
+        self.pid = pid
