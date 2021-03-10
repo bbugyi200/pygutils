@@ -112,3 +112,10 @@ class StillAliveException(Exception):
 
     def __init__(self, pid: int):
         self.pid = pid
+
+
+def command_exists(cmd: str) -> bool:
+    ps = sp.Popen(
+        "hash {}".format(cmd), shell=True, stdout=sp.PIPE, stderr=sp.PIPE
+    )
+    return ps.wait() == 0
