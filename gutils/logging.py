@@ -10,10 +10,10 @@ from typing import List, Mapping
 from loguru import logger as log
 
 
-def configure(_name: str, *, debug: bool, verbose: bool) -> None:
+def configure(name: str, *, debug: bool, verbose: bool) -> None:
     """Configure the Logger."""
     # In case __file__ is used...
-    name = os.path.basename(_name).replace('.py', '')
+    basename = os.path.basename(name).replace('.py', '')
 
     def sformat(report: Mapping) -> str:
         verbose = bool("SUPERVISOR_ENABLED" in os.environ)
@@ -30,7 +30,7 @@ def configure(_name: str, *, debug: bool, verbose: bool) -> None:
         filter=lambda record: "quiet" not in record["extra"]
     )
     file_h = dict(
-        sink=f"/var/tmp/{name}.log",
+        sink=f"/var/tmp/{basename}.log",
         format=fformat,
         rotation="1 day"
     )

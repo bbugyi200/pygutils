@@ -1,12 +1,10 @@
-"""Global Utilities
-
-This package imports core.py into its global namespace. See help(gutils.core)
-for documentation on globally defined functions.
-"""
+"""Global Utilities"""
 
 # For accessing modules as attributes of 'gutils' (e.g. 'gutils.logging').
 from gutils import colorize, debug, io, logging, xdg
-# DEPRECIATED: Use 'from gutils.core import <NAME>' instead.
+
+# For accessing core functions/classes via `from gutils import <NAME>`.
+# (DEPRECIATED: Use 'from gutils.core import <NAME>' instead.)
 from gutils.core import (
     ArgumentParser,
     catch,
@@ -23,5 +21,8 @@ from gutils.core import (
     xkey,
     xtype,
 )
-# DEPRECIATED: Use 'from gutils import subprocess as bsp' instead.
+
+# For accessing the create_pidfile() function via `from gutils import
+# create_pidfile`.
+# (DEPRECIATED: Use 'from gutils import subprocess as bsp' instead.)
 from gutils.subprocess import create_pidfile
