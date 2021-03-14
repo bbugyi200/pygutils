@@ -10,11 +10,15 @@ import string
 import subprocess as sp
 import sys
 from textwrap import wrap
-from typing import Any, Callable, Iterator
+from typing import Any, Callable, Iterator, Protocol, Sequence, TypeVar
 
 from loguru import logger as log
 
+import gutils
 import gutils.shared as shared
+
+
+_T = TypeVar("_T")
 
 
 def ArgumentParser(
@@ -238,3 +242,53 @@ def _path_to_module(path):
 
     P = P.replace("/", ".")
     return P
+
+
+class MainType(Protocol):
+    def __call__(self, argv: Sequence[str] = None) -> int:
+        pass
+
+
+def main_factory(
+    parse_cli_args: Callable[[Sequence[str]], _T],
+    run: Callable[[_T], int],
+) -> MainType:
+    """
+    Returns a generic main() function to be used as an entry point.
+    """
+
+    def main(argv: Sequence[str] = None) -> int:
+        if argv is None:
+            argv = sys.argv
+
+        args = parse_cli_args(argv)
+
+        if hasattr(args, "debug"):
+            debug: bool = getattr(args, "debug")
+        else:
+            debug = False
+
+        if hasattr(args, "verbose"):
+            verbose: bool = getattr(args, "verbose")
+        else:
+            verbose = False
+
+        gutils.logging.configure(__file__, debug=debug, verbose=verbose)
+        log.debug("args = {!r}", args)
+
+        scriptname = shared.scriptname(inspect.stack())
+
+        try:
+            status = run(args)
+        except KeyboardInterrupt:
+            print("Received SIGINT signal. Terminating {}...".format(scriptname))
+            return 0
+        except Exception:
+            log.exception(
+                "An unrecoverable error has been raised by '{}'.", scriptname
+            )
+            raise
+        else:
+            return status
+
+    return main
