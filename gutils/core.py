@@ -10,12 +10,18 @@ import string
 import subprocess as sp
 import sys
 from textwrap import wrap
-from typing import Any, Callable, Iterator, Protocol, Sequence, TypeVar
+from typing import Any, Callable, Iterator, Sequence, TypeVar
 
 from loguru import logger as log
 
 import gutils
 import gutils.shared as shared
+
+
+try:
+    from typing import Protocol
+except ImportError:
+    Protocol = object  # type: ignore
 
 
 _T = TypeVar("_T")
@@ -254,7 +260,7 @@ def main_factory(
     run: Callable[[_T], int],
 ) -> MainType:
     """
-    Returns a generic main() function to be used as an entry point.
+    Returns a generic main() function to be used as a script's entry point.
     """
 
     def main(argv: Sequence[str] = None) -> int:
@@ -281,11 +287,14 @@ def main_factory(
         try:
             status = run(args)
         except KeyboardInterrupt:
-            print("Received SIGINT signal. Terminating {}...".format(scriptname))
+            print(
+                "Received SIGINT signal. Terminating {}...".format(scriptname)
+            )
             return 0
         except Exception:
             log.exception(
-                "An unrecoverable error has been raised by '{}'.", scriptname
+                "An unrecoverable error has been raised. Terminating {}...",
+                scriptname,
             )
             raise
         else:
