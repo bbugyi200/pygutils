@@ -25,4 +25,4 @@ from gutils.core import (
 # For accessing the create_pidfile() function via `from gutils import
 # create_pidfile`.
 # (DEPRECIATED: Use 'from gutils import subprocess as bsp' instead.)
-from gutils.subprocess import create_pidfile
+from gutils.subprocess import create_pidfile, StillAliveException
