@@ -12,9 +12,10 @@ import sys
 from textwrap import wrap
 from typing import Any, Callable, Iterator, Sequence, TypeVar
 
+from loguru import logger as log
+
 from gutils.logging import configure as configure_logging
 import gutils.shared as shared
-from loguru import logger as log
 
 
 try:

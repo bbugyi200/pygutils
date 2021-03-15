@@ -5,9 +5,6 @@ from gutils import subprocess as bsp
 from gutils.errors import BResult, Err, Ok
 
 
-GitRemote = NamedTuple("GitRemote", [("name", str), ("url", str)])
-
-
 def top_level_dir(cwd: str = None) -> BResult[str]:
     """
     Returns:
@@ -21,6 +18,11 @@ def top_level_dir(cwd: str = None) -> BResult[str]:
     else:
         out, _err = out_err_r.ok()
         return Ok(out)
+
+
+class GitRemote(NamedTuple):
+    name: str
+    url: str
 
 
 def remotes() -> BResult[List[GitRemote]]:
