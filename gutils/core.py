@@ -12,10 +12,9 @@ import sys
 from textwrap import wrap
 from typing import Any, Callable, Iterator, Sequence, TypeVar
 
-from loguru import logger as log
-
-import gutils
+from gutils.logging import configure as configure_logging
 import gutils.shared as shared
+from loguru import logger as log
 
 
 try:
@@ -250,7 +249,7 @@ def _path_to_module(path):
     return P
 
 
-class MainType(Protocol):
+class _MainType(Protocol):
     def __call__(self, argv: Sequence[str] = None) -> int:
         pass
 
@@ -258,7 +257,7 @@ class MainType(Protocol):
 def main_factory(
     parse_cli_args: Callable[[Sequence[str]], _T],
     run: Callable[[_T], int],
-) -> MainType:
+) -> _MainType:
     """
     Returns a generic main() function to be used as a script's entry point.
     """
@@ -279,7 +278,7 @@ def main_factory(
         else:
             verbose = False
 
-        gutils.logging.configure(__file__, debug=debug, verbose=verbose)
+        configure_logging(__file__, debug=debug, verbose=verbose)
         log.debug("args = {!r}", args)
 
         scriptname = shared.scriptname(inspect.stack())

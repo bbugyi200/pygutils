@@ -97,7 +97,8 @@ class BugyiError(Exception):
     def _repr(self, width=80):
         # type: (Optional[int]) -> str
         """
-        Format error to width.  If width is None, return string suitable for traceback.
+        Format error to width.  If width is None, return string suitable for
+        traceback.
         """
         super_str = super().__str__()
 
@@ -131,7 +132,8 @@ class BugyiError(Exception):
     def report(self, width=80):
         # type: (int) -> ErrorReport
         """
-        Return an ErrorReport object formatting the current state of this BugyiError
+        Return an ErrorReport object formatting the current state of this
+        BugyiError
         """
         TITLE = cname(self)
         MIDDLE_MSG = "was the direct cause of"
@@ -161,7 +163,9 @@ class BugyiError(Exception):
         if rem % 2 != 0:
             right_minibar = H_CH + right_minibar
 
-        middle_header = "{0} {1} {2}".format(left_minibar, MIDDLE_MSG, right_minibar)
+        middle_header = "{0} {1} {2}".format(
+            left_minibar, MIDDLE_MSG, right_minibar
+        )
 
         dashes = "-" * len(header)
 
@@ -234,7 +238,10 @@ class ErrorReport:
         V_CH = "+"  # report box corners
         for i, inc in [(0, 1), (-1, -1)]:
             j = i
-            while 0 <= j < len(self.report_lines) and not self.report_lines[j].line:
+            while (
+                0 <= j < len(self.report_lines)
+                and not self.report_lines[j].line
+            ):
                 j += inc
 
             rline = self.report_lines[j]
