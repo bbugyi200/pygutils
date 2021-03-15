@@ -1,4 +1,4 @@
-"""Internal Shared Utilities for gutils Package"""
+"""Internal Shared Utilities for bugyi Package"""
 
 import inspect
 from pathlib import Path

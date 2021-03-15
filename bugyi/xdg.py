@@ -4,7 +4,7 @@ import inspect
 import os
 from pathlib import Path
 
-import gutils.shared as shared
+import bugyi.shared as shared
 
 _home = os.environ.get('HOME')
 _xdg_vals = {

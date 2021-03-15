@@ -13,7 +13,7 @@ from typing import (
 
 from typing_extensions import Protocol
 
-from gutils import Inspector, cname, efill, ewrap
+from bugyi import Inspector, cname, efill, ewrap
 
 
 _T = TypeVar("_T")

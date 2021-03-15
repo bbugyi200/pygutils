@@ -1,8 +1,8 @@
 import sys
 from typing import Iterable, List, NamedTuple
 
-from gutils import subprocess as bsp
-from gutils.errors import BResult, Err, Ok
+from bugyi import subprocess as bsp
+from bugyi.errors import BResult, Err, Ok
 
 
 def top_level_dir(cwd: str = None) -> BResult[str]:

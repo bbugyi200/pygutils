@@ -14,8 +14,8 @@ from typing import Any, Callable, Iterator, Sequence, TypeVar
 
 from loguru import logger as log
 
-from gutils.logging import configure as configure_logging
-import gutils.shared as shared
+from bugyi.logging import configure as configure_logging
+import bugyi.shared as shared
 
 
 try:
