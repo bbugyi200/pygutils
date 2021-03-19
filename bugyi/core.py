@@ -256,8 +256,7 @@ class _MainType(Protocol):
 
 
 def main_factory(
-    parse_cli_args: Callable[[Sequence[str]], _T],
-    run: Callable[[_T], int],
+    parse_cli_args: Callable[[Sequence[str]], _T], run: Callable[[_T], int]
 ) -> _MainType:
     """
     Returns a generic main() function to be used as a script's entry point.
@@ -269,15 +268,8 @@ def main_factory(
 
         args = parse_cli_args(argv)
 
-        if hasattr(args, "debug"):
-            debug: bool = getattr(args, "debug")
-        else:
-            debug = False
-
-        if hasattr(args, "verbose"):
-            verbose: bool = getattr(args, "verbose")
-        else:
-            verbose = False
+        debug: bool = getattr(args, "debug", False)
+        verbose: bool = getattr(args, "verbose", False)
 
         configure_logging(__file__, debug=debug, verbose=verbose)
         log.debug("args = {!r}", args)

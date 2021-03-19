@@ -7,8 +7,9 @@ from bugyi import xdg
 from bugyi.errors import BErr, BResult, BugyiError, Err, Ok
 
 
-def safe_popen(cmd_parts, **kwargs):
-    # type: (Iterable[str], Any) -> BResult[Tuple[str, str]]
+def safe_popen(
+    cmd_parts: Iterable[str], **kwargs: Any
+) -> BResult[Tuple[str, str]]:
     """Wrapper for subprocess.Popen(...).
 
     Returns:
@@ -18,11 +19,8 @@ def safe_popen(cmd_parts, **kwargs):
     """
     cmd_list = list(cmd_parts)
 
-    if "stdout" not in kwargs:
-        kwargs["stdout"] = sp.PIPE
-
-    if "stderr" not in kwargs:
-        kwargs["stderr"] = sp.PIPE
+    kwargs.setdefault("stdout", sp.PIPE)
+    kwargs.setdefault("stderr", sp.PIPE)
 
     ps = sp.Popen(cmd_list, **kwargs)
 
@@ -33,8 +31,7 @@ def safe_popen(cmd_parts, **kwargs):
     return Ok((proc.out, proc.err))
 
 
-def unsafe_popen(cmd_parts, **kwargs):
-    # type: (Iterable[str], Any) -> Tuple[str, str]
+def unsafe_popen(cmd_parts: Iterable[str], **kwargs: Any) -> Tuple[str, str]:
     """Wrapper for subprocess.Popen(...)
 
     You can use unsafe_popen() instead of safe_popen() when you don't care
@@ -57,8 +54,7 @@ def unsafe_popen(cmd_parts, **kwargs):
 
 
 class DoneProcess:
-    def __init__(self, ps, cmd_list):
-        # type: (sp.Popen, List[str]) -> None
+    def __init__(self, ps: sp.Popen, cmd_list: List[str]) -> None:
         self.ps = ps
         self.cmd_list = cmd_list
 
@@ -66,8 +62,7 @@ class DoneProcess:
         self.out = "" if stdout is None else str(stdout.decode().strip())
         self.err = "" if stderr is None else str(stderr.decode().strip())
 
-    def to_error(self, up=0):
-        # type: (int) -> Err[BugyiError]
+    def to_error(self, up: int = 0) -> Err[BugyiError]:
         maybe_out = ""
         if self.out:
             maybe_out = "\n\n----- STDOUT\n{}".format(self.out)

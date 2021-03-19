@@ -6,6 +6,7 @@ from pathlib import Path
 
 import bugyi.shared as shared
 
+
 _home = os.environ.get('HOME')
 _xdg_vals = {
     "config": ("XDG_CONFIG_HOME", f"{_home}/.config"),

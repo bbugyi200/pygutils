@@ -66,6 +66,10 @@ def init_err_helper(Error: Type[_E]) -> _ErrHelper[_E]:
     """
 
     def err_helper(*args: Any, **kwargs: Any) -> Err[_E]:
+        if Error is BugyiError:
+            kwargs.setdefault("up", 0)
+            kwargs["up"] += 1
+
         e = Error(*args, **kwargs)  # type: ignore
         return Err(e)
 

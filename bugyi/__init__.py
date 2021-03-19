@@ -26,8 +26,7 @@ from bugyi.core import (
     xtype,
 )
 
-# For accessing the create_pidfile() function via `from bugyi import
-# create_pidfile`.
+# For accessing subprocess functions/classes via `from bugyi import <NAME>`.
 #
 # DEPRECIATED: Use 'from bugyi import subprocess as bsp' instead.
 from bugyi.subprocess import create_pidfile, StillAliveException
