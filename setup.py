@@ -16,7 +16,7 @@ setup(
     license="MIT license",
     keywords='pylibs',
     name='bbugyi-pylibs',
-    package_data={"gutils": ["py.typed"]},
+    package_data={"bugyi": ["py.typed"]},
     packages=["gutils", "bugyi"],
     package_dir={"": "./"},
     test_suite='tests',
