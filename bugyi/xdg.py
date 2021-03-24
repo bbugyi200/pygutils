@@ -63,11 +63,6 @@ def get_base_dir(xdg_type: str) -> Path:
     return xdg_dir
 
 
-# DEPRECIATED: Use newer, more descriptive function names instead.
-init = init_full_dir
-get = get_base_dir
-
-
 def _get_base_dir(envvar: str, default_dir: str) -> Path:
     if envvar in os.environ:
         xdg_dir = os.environ[envvar]
@@ -75,3 +70,8 @@ def _get_base_dir(envvar: str, default_dir: str) -> Path:
         xdg_dir = default_dir
 
     return Path(xdg_dir)
+
+
+# DEPRECIATED: Use newer, more descriptive function names instead.
+init = init_full_dir
+get = get_base_dir
