@@ -16,12 +16,7 @@ from loguru import logger as log
 
 from bugyi.logging import configure as configure_logging
 import bugyi.shared as shared
-
-
-try:
-    from typing import Protocol
-except ImportError:
-    Protocol = object  # type: ignore
+from bugyi.types import Protocol
 
 
 _T = TypeVar("_T")
