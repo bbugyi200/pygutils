@@ -2,11 +2,11 @@ from pathlib import Path
 from typing import Union
 
 
-# 'Protocol' is imported from this module by other modules/scripts.
 try:
-    from typing import Protocol  # pylint: disable=unused-import
+    from typing import Protocol as protocol_type
 except ImportError:
-    Protocol = object  # type: ignore
+    protocol_type = object  # type: ignore
 
 
 PathLike = Union[str, Path]
+Protocol = protocol_type
