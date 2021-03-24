@@ -9,7 +9,21 @@ from typing import List, Union
 try:
     from typing import Literal, Protocol  # pylint: disable=unused-import
 except ImportError:
-    from typing_extensions import Literal, Protocol  # type: ignore
+    try:
+        from typing_extensions import Literal, Protocol  # type: ignore
+    except ImportError:
+        from collections import defaultdict
+        from typing import Any
+
+        class _ProtocolType:
+            def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+                return None
+
+            def __getitem__(self, key: Any) -> "_ProtocolType":
+                return self
+
+        Literal = defaultdict(lambda: str)  # type: ignore
+        Protocol = _ProtocolType()  # type: ignore
 
 
 PathLike = Union[str, Path]
