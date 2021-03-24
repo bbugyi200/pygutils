@@ -1,27 +1,26 @@
 """XDG Utilities"""
 
-import inspect
 import os
 from pathlib import Path
 from typing import Dict, Tuple
 
-import bugyi.shared as shared
-from bugyi.types import Literal, StackType
+from bugyi.core import scriptname
+from bugyi.types import Literal
 
 
-XDG_Type = Literal["config", "data", "runtime", "cache"]
+XDG_Type = Literal["cache", "config", "data", "runtime"]
 
 _home = os.environ.get("HOME")
 # Mapping of XDG directory types to 2-tuples of the form (envvar, default_dir).
 _xdg_type_map: Dict[XDG_Type, Tuple[str, str]] = {
+    "cache": ("XDG_CACHE_HOME", f"{_home}/.cache"),
     "config": ("XDG_CONFIG_HOME", f"{_home}/.config"),
     "data": ("XDG_DATA_HOME", f"{_home}/.local/share"),
     "runtime": ("XDG_RUNTIME_DIR", "/tmp"),
-    "cache": ("XDG_CACHE_HOME", f"{_home}/.cache"),
 }
 
 
-def init_full_dir(xdg_type: XDG_Type, stack: StackType = None) -> Path:
+def init_full_dir(xdg_type: XDG_Type, *, up: int = 0) -> Path:
     """
     Returns:
         Full XDG user directory (including scriptname).
@@ -29,25 +28,19 @@ def init_full_dir(xdg_type: XDG_Type, stack: StackType = None) -> Path:
     Side Effects:
         Ensures the full XDG user directory exists before returning it.
     """
-    if stack is None:
-        stack = inspect.stack()
-
-    full_xdg_dir = get_full_dir(xdg_type, stack)
+    full_xdg_dir = get_full_dir(xdg_type, up=up + 1)
     full_xdg_dir.mkdir(parents=True, exist_ok=True)
     return full_xdg_dir
 
 
-def get_full_dir(xdg_type: XDG_Type, stack: StackType = None) -> Path:
+def get_full_dir(xdg_type: XDG_Type, *, up: int = 0) -> Path:
     """
     Returns:
         Full XDG user directory (including scriptname).
     """
-    if stack is None:
-        stack = inspect.stack()
-
-    scriptname = shared.scriptname(stack)
+    name = scriptname(up=up + 1)
     base_xdg_dir = get_base_dir(xdg_type)
-    full_xdg_dir = base_xdg_dir / scriptname
+    full_xdg_dir = base_xdg_dir / name
     return full_xdg_dir
 
 
@@ -56,11 +49,11 @@ def get_base_dir(xdg_type: XDG_Type) -> Path:
     Returns:
         The base/general XDG user directory.
     """
-    if xdg_type not in _xdg_type_map:
-        raise ValueError(
-            "Argument @xdg_type MUST be one of the following options: {}"
-            .format(list(_xdg_type_map.keys()))
-        )
+    assert (
+        xdg_type in _xdg_type_map
+    ), "Provided @xdg_type parameter is not valid: {!r} not in {}".format(
+        xdg_type, list(_xdg_type_map.keys())
+    )
 
     envvar, default_dir = _xdg_type_map[xdg_type]
     xdg_dir = _get_base_dir(envvar, default_dir)

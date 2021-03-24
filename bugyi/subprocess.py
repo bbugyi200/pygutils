@@ -1,4 +1,3 @@
-import inspect
 import os
 import subprocess as sp
 from typing import Any, Iterable, List, Tuple
@@ -79,13 +78,13 @@ class DoneProcess:
         )
 
 
-def create_pidfile() -> None:
+def create_pidfile(*, up: int = 0) -> None:
     """Writes PID to file, which is created if necessary.
 
     Raises:
         StillAliveException: if old instance of script is still alive.
     """
-    PIDFILE = "{}/pid".format(xdg.init("runtime", stack=inspect.stack()))
+    PIDFILE = "{}/pid".format(xdg.init_full_dir("runtime", up=up + 1))
     if os.path.isfile(PIDFILE):
         old_pid = int(open(PIDFILE, "r").read())
         try:

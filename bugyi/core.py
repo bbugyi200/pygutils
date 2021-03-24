@@ -4,6 +4,7 @@ import errno
 import inspect
 import os
 from os.path import abspath, isfile, realpath
+from pathlib import Path
 import random
 import signal as sig
 import string
@@ -15,7 +16,6 @@ from typing import Any, Callable, Iterator, Sequence, TypeVar
 from loguru import logger as log
 
 from bugyi.logging import configure as configure_logging
-import bugyi.shared as shared
 from bugyi.types import Protocol
 
 
@@ -102,7 +102,7 @@ def notify(*args: str, title: str = None, urgency: str = None) -> None:
         raise ValueError(str(e)) from e
 
     if title is None:
-        title = shared.scriptname(inspect.stack())
+        title = scriptname(up=1)
 
     cmd_list = ["notify-send"]
     cmd_list.extend([title])
@@ -120,7 +120,7 @@ def secret() -> str:
     secret_key = "".join(
         random.choice(string.ascii_letters + string.digits) for _ in range(16)
     )
-    fp = "/tmp/{}.secret".format(shared.scriptname(inspect.stack()))
+    fp = "/tmp/{}.secret".format(scriptname(up=1))
 
     @atexit.register
     def remove_secret_file() -> None:  # pylint: disable=unused-variable
@@ -214,13 +214,13 @@ class Inspector:
 
     def __init__(self, up=0):
         # type: (int) -> None
-        stack = inspect.stack()[up + 1]
+        frame = inspect.stack()[up + 1]
 
-        self.module_name = _path_to_module(stack[1])
-        self.file_name = stack[1]
-        self.line_number = stack[2]
-        self.function_name = stack[3]
-        self.lines = "".join(stack[4] or [])
+        self.module_name = _path_to_module(frame[1])
+        self.file_name = frame[1]
+        self.line_number = frame[2]
+        self.function_name = frame[3]
+        self.lines = "".join(frame[4] or [])
 
 
 def _path_to_module(path):
@@ -266,7 +266,7 @@ def main_factory(
         debug: bool = getattr(args, "debug", False)
         verbose: bool = getattr(args, "verbose", False)
 
-        name = shared.scriptname(inspect.stack())
+        name = scriptname(up=1)
         configure_logging(name, debug=debug, verbose=verbose)
         log.debug("args = {!r}", args)
 
@@ -285,3 +285,8 @@ def main_factory(
             return status
 
     return main
+
+
+def scriptname(*, up: int = 0) -> str:
+    frame = inspect.stack()[up + 1]
+    return Path(frame.filename).stem

@@ -1,5 +1,3 @@
-"""Global Utilities"""
-
 # For accessing modules as attributes of 'bugyi' (e.g. 'bugyi.logging').
 #
 # DEPRECIATED: Use `from bugyi import <MODULE>` or `from bugyi.<MODULE>
