@@ -1,11 +1,8 @@
 """Internal Shared Utilities for bugyi Package"""
 
-import inspect
 from pathlib import Path
-from typing import List
 
-
-StackType = List[inspect.FrameInfo]
+from bugyi.types import StackType
 
 
 def scriptname(stack: StackType) -> str:

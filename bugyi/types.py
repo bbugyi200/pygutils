@@ -1,5 +1,6 @@
+import inspect
 from pathlib import Path
-from typing import Union
+from typing import List, Union
 
 
 # These types are imported from this module by other modules/scripts.
@@ -10,3 +11,4 @@ except ImportError:
 
 
 PathLike = Union[str, Path]
+StackType = List[inspect.FrameInfo]

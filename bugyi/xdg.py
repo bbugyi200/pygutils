@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 import bugyi.shared as shared
+from bugyi.types import StackType
 
 
 _home = os.environ.get("HOME")
@@ -17,7 +18,7 @@ _xdg_type_map = {
 }
 
 
-def init_full_dir(xdg_type: str, stack: shared.StackType = None) -> Path:
+def init_full_dir(xdg_type: str, stack: StackType = None) -> Path:
     """
     Returns:
         Full XDG user directory (including scriptname).
@@ -30,7 +31,7 @@ def init_full_dir(xdg_type: str, stack: shared.StackType = None) -> Path:
     return full_xdg_dir
 
 
-def get_full_dir(xdg_type: str, stack: shared.StackType = None) -> Path:
+def get_full_dir(xdg_type: str, stack: StackType = None) -> Path:
     """
     Returns:
         Full XDG user directory (including scriptname).
