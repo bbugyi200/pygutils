@@ -4,10 +4,10 @@ from typing import Callable
 
 
 def _color_factory(N: int) -> Callable[[str], str]:
-    def colorizer(msg: str) -> str:
+    def color(msg: str) -> str:
         return "%s%s%s" % ("\033[{}m".format(N), msg, "\033[0m")
 
-    return colorizer
+    return color
 
 
 black = _color_factory(30)

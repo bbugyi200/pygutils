@@ -271,22 +271,19 @@ def main_factory(
         debug: bool = getattr(args, "debug", False)
         verbose: bool = getattr(args, "verbose", False)
 
-        configure_logging(__file__, debug=debug, verbose=verbose)
+        name = shared.scriptname(inspect.stack())
+        configure_logging(name, debug=debug, verbose=verbose)
         log.debug("args = {!r}", args)
-
-        scriptname = shared.scriptname(inspect.stack())
 
         try:
             status = run(args)
         except KeyboardInterrupt:
-            print(
-                "Received SIGINT signal. Terminating {}...".format(scriptname)
-            )
+            print("Received SIGINT signal. Terminating {}...".format(name))
             return 0
         except Exception:
             log.exception(
                 "An unrecoverable error has been raised. Terminating {}...",
-                scriptname,
+                name,
             )
             raise
         else:
