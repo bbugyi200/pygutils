@@ -6,7 +6,10 @@ from typing import Union
 try:
     from typing import Protocol  # pylint: disable=unused-import
 except ImportError:
-    Protocol = object  # type: ignore
+    try:
+        from typing_extensions import Protocol  # type: ignore
+    except ImportError:
+        Protocol = object  # type: ignore
 
 
 PathLike = Union[str, Path]
