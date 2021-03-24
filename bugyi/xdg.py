@@ -56,6 +56,12 @@ def get_base_dir(xdg_type: XDG_Type) -> Path:
     Returns:
         The base/general XDG user directory.
     """
+    if xdg_type not in _xdg_type_map:
+        raise ValueError(
+            "Argument @xdg_type MUST be one of the following options: {}"
+            .format(list(_xdg_type_map.keys()))
+        )
+
     envvar, default_dir = _xdg_type_map[xdg_type]
     xdg_dir = _get_base_dir(envvar, default_dir)
     return xdg_dir

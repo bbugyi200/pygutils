@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import List, Union
 
 
-# These types are imported from this module by other modules/scripts.
+# The below 'typing' module types are imported from this module by other
+# modules/scripts.
 #
 # Used to maintain Python<=3.7 compatibility.
 try:
@@ -15,15 +16,15 @@ except ImportError:
         from collections import defaultdict
         from typing import Any
 
-        class _ProtocolType:
+        class _ProtocolMock:
             def __init__(self, *_args: Any, **_kwargs: Any) -> None:
                 return None
 
-            def __getitem__(self, key: Any) -> "_ProtocolType":
+            def __getitem__(self, _key: Any) -> "_ProtocolMock":
                 return self
 
         Literal = defaultdict(lambda: str)  # type: ignore
-        Protocol = _ProtocolType()  # type: ignore
+        Protocol = _ProtocolMock()  # type: ignore
 
 
 PathLike = Union[str, Path]
