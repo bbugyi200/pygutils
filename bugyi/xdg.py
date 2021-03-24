@@ -26,6 +26,9 @@ def init_full_dir(xdg_type: str, stack: StackType = None) -> Path:
     Side Effects:
         Ensures the full XDG user directory exists before returning it.
     """
+    if stack is None:
+        stack = inspect.stack()
+
     full_xdg_dir = get_full_dir(xdg_type, stack)
     full_xdg_dir.mkdir(parents=True, exist_ok=True)
     return full_xdg_dir

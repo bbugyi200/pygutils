@@ -6,7 +6,7 @@ from bugyi.types import StackType
 
 
 def scriptname(stack: StackType) -> str:
-    """ Returns the Filename of the Calling Module
+    """Returns the Filename of the Calling Module
 
     Args:
         stack: object returned by 'inspect.stack'
