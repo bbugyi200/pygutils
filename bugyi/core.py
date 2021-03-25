@@ -265,8 +265,8 @@ def main_factory(
 
         debug: bool = getattr(args, "debug", False)
         verbose: bool = getattr(args, "verbose", False)
-
         name = scriptname(up=1)
+
         configure_logging(name, debug=debug, verbose=verbose)
         log.debug("args = {!r}", args)
 

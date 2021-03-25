@@ -3,9 +3,6 @@ from pathlib import Path
 from typing import Any, Type, TypeVar, Union
 
 
-_T = TypeVar("_T")
-
-
 # The below 'typing' module types are imported from this module by other
 # modules/scripts.
 #
@@ -20,6 +17,7 @@ except ImportError:
     try:
         from typing_extension import Final, Literal, Protocol  # type: ignore
     except ImportError:
+        _T = TypeVar("_T")
 
         class _FinalMock(type):
             def __getitem__(cls, key: Type[_T]) -> Type[_T]:

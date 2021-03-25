@@ -56,17 +56,8 @@ def get_base_dir(xdg_type: XDG_Type) -> Path:
     )
 
     envvar, default_dir = _xdg_type_map[xdg_type]
-    xdg_dir = _get_base_dir(envvar, default_dir)
+    xdg_dir = Path(os.environ.get(envvar, default_dir))
     return xdg_dir
-
-
-def _get_base_dir(envvar: str, default_dir: str) -> Path:
-    if envvar in os.environ:
-        xdg_dir = os.environ[envvar]
-    else:
-        xdg_dir = default_dir
-
-    return Path(xdg_dir)
 
 
 # DEPRECIATED: Use newer, more descriptive function names instead.
