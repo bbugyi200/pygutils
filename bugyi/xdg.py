@@ -38,9 +38,8 @@ def get_full_dir(xdg_type: XDG_Type, *, up: int = 0) -> Path:
     Returns:
         Full XDG user directory (including scriptname).
     """
-    name = scriptname(up=up + 1)
     base_xdg_dir = get_base_dir(xdg_type)
-    full_xdg_dir = base_xdg_dir / name
+    full_xdg_dir = base_xdg_dir / scriptname(up=up + 1)
     return full_xdg_dir
 
 

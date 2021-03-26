@@ -212,8 +212,7 @@ class Inspector:
     Helper class for python introspection (e.g. What line number is this?)
     """
 
-    def __init__(self, up=0):
-        # type: (int) -> None
+    def __init__(self, *, up: int = 0) -> None:
         frame = inspect.stack()[up + 1]
 
         self.module_name = _path_to_module(frame[1])
