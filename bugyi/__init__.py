@@ -4,8 +4,6 @@
 # import <NAME>` instead.
 from bugyi import colors, debug, io, logging, xdg
 
-# For accessing core functions/classes via `from bugyi import <NAME>`.
-#
 # DEPRECIATED: Use 'from bugyi.core import <NAME>' instead.
 from bugyi.core import (
     ArgumentParser,
@@ -16,21 +14,17 @@ from bugyi.core import (
     ewrap,
     Inspector,
     mkfifo,
-    notify,
     secret,
     shell,
     signal,
-    xkey,
-    xtype,
 )
 
-# For accessing subprocess functions/classes via `from bugyi import <NAME>`.
-#
+# DEPRECIATED: Import directly from the 'bugyi.tools' module instead.
+from bugyi.tools import notify, xkey, xtype
+
 # DEPRECIATED: Use 'from bugyi import subprocess as bsp' instead.
 from bugyi.subprocess import create_pidfile, StillAliveException
 
 
-# For accessing the colors modules via `from bugyi import colorize`.
-#
 # DEPRECIATED: Use `from bugyi import colors` instead.
 colorize = colors
