@@ -11,7 +11,8 @@ from typing import (
     Union,
 )
 
-from bugyi import Inspector, cname, efill, ewrap
+from bugyi.core import efill, ewrap
+from bugyi.meta import Inspector, cname
 from bugyi.types import Protocol
 
 

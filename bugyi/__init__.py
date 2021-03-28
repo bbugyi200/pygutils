@@ -8,11 +8,9 @@ from bugyi import colors, debug, io, logging, xdg
 from bugyi.core import (
     ArgumentParser,
     catch,
-    cname,
     create_dir,
     efill,
     ewrap,
-    Inspector,
     mkfifo,
     secret,
     shell,

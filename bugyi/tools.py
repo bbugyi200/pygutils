@@ -6,8 +6,8 @@ command.
 import subprocess as sp
 
 from bugyi import subprocess as bsp
-from bugyi.core import scriptname
 from bugyi.errors import BResult, Err, Ok
+from bugyi.meta import scriptname
 
 
 def get_pass(key: str) -> BResult[str]:

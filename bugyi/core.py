@@ -3,8 +3,6 @@ import atexit
 import errno
 import inspect
 import os
-from os.path import abspath, isfile, realpath
-from pathlib import Path
 import random
 import signal as sig
 import string
@@ -15,7 +13,6 @@ from typing import Any, Callable, Iterator, Sequence, TypeVar
 
 from loguru import logger as log
 
-from bugyi.logging import configure as configure_logging
 from bugyi.types import Protocol
 
 
@@ -47,7 +44,10 @@ def ArgumentParser(
 
 
 def catch(func: Callable) -> Callable:
-    """Wrapper for loguru.logger.catch"""
+    """Wrapper for loguru.logger.catch
+
+    DEPRECIATED: Use the main_factory() function instead.
+    """
     catcher = log.bind(quiet=True)
     return catcher.catch(
         message="{record[exception].type.__name__}", reraise=True
@@ -82,6 +82,8 @@ def mkfifo(FIFO_PATH: str) -> None:
 
 def secret() -> str:
     """Get Secret String for Use with secret.sh Script"""
+    from bugyi.meta import scriptname
+
     secret_key = "".join(
         random.choice(string.ascii_letters + string.digits) for _ in range(16)
     )
@@ -102,7 +104,10 @@ def secret() -> str:
 
 
 def shell(*cmds: str) -> str:
-    """Run Shell Command(s)"""
+    """Run Shell Command(s)
+
+    DEPRECIATED: Use the bugyi.subprocess module's functions instead.
+    """
     out = sp.check_output("; ".join(cmds), shell=True)
     return out.decode().strip()
 
@@ -119,14 +124,9 @@ def signal(*signums: int) -> Callable:
     return _signal
 
 
-def cname(obj):
-    # type: (object) -> str
-    """Helper function for getting an object's class name as a string."""
-    return obj.__class__.__name__
-
-
-def ewrap(multiline_msg, width=80, indent=0):
-    # type: (str, int, int) -> Iterator[str]
+def ewrap(
+    multiline_msg: str, width: int = 80, indent: int = 0
+) -> Iterator[str]:
     """A better version of textwrap.wrap()."""
     for msg in multiline_msg.split("\n"):
         if not msg:
@@ -146,47 +146,9 @@ def ewrap(multiline_msg, width=80, indent=0):
             yield m
 
 
-def efill(multiline_msg, width=80, indent=0):
-    # type: (str, int, int) -> str
+def efill(multiline_msg: str, width: int = 80, indent: int = 0) -> str:
     """A better version of textwrap.fill()."""
     return "\n".join(ewrap(multiline_msg, width, indent))
-
-
-class Inspector:
-    """
-    Helper class for python introspection (e.g. What line number is this?)
-    """
-
-    def __init__(self, *, up: int = 0) -> None:
-        frame = inspect.stack()[up + 1]
-
-        self.module_name = _path_to_module(frame[1])
-        self.file_name = frame[1]
-        self.line_number = frame[2]
-        self.function_name = frame[3]
-        self.lines = "".join(frame[4] or [])
-
-
-def _path_to_module(path):
-    # type: (str) -> str
-    P = path
-
-    # HACK: Improves the (still broken) output in some weird cases where
-    # python gets confused about paths.
-    real_abs_P = realpath(abspath(P))
-    if isfile(real_abs_P):
-        P = real_abs_P
-
-    if P.endswith((".py", ".px")):
-        P = P[:-3]
-
-    sorted_pypaths = sorted(sys.path, key=lambda x: -len(x))
-    for pypath in sorted_pypaths:
-        pypath = realpath(pypath)
-        P = P.replace(pypath + "/", "")
-
-    P = P.replace("/", ".")
-    return P
 
 
 class _MainType(Protocol):
@@ -200,6 +162,8 @@ def main_factory(
     """
     Returns a generic main() function to be used as a script's entry point.
     """
+    from bugyi.logging import configure as configure_logging
+    from bugyi.meta import scriptname
 
     def main(argv: Sequence[str] = None) -> int:
         if argv is None:
@@ -229,8 +193,3 @@ def main_factory(
             return status
 
     return main
-
-
-def scriptname(*, up: int = 0) -> str:
-    frame = inspect.stack()[up + 1]
-    return Path(frame.filename).stem

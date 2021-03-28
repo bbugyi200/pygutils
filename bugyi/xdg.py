@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from typing import Dict, Tuple
 
-from bugyi.core import scriptname
+from bugyi.meta import scriptname
 from bugyi.types import Literal
 
 
