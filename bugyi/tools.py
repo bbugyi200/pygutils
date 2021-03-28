@@ -5,18 +5,11 @@ command.
 
 import subprocess as sp
 
+from loguru import logger as log
+
 from bugyi import subprocess as bsp
 from bugyi.errors import BResult, Err, Ok
 from bugyi.meta import scriptname
-
-
-def get_pass(key: str) -> BResult[str]:
-    out_err_r = bsp.safe_popen(["pass", "show", key])
-    if isinstance(out_err_r, Err):
-        return out_err_r
-
-    password, _err = out_err_r.ok()
-    return Ok(password)
 
 
 def notify(
@@ -54,6 +47,24 @@ def notify(
     cmd_list.extend(args)
 
     sp.check_call(cmd_list)
+
+
+def pass_show(key: str) -> BResult[str]:
+    out_err_r = bsp.safe_popen(["pass", "show", key])
+    if isinstance(out_err_r, Err):
+        return out_err_r
+
+    password, _err = out_err_r.ok()
+    return Ok(password)
+
+
+def xclip_copy(clip: str) -> None:
+    if bsp.command_exists("xclip"):
+        ps = sp.Popen(["xclip", "-sel", "clip"], stdin=sp.PIPE)
+        ps.communicate(input=clip.encode())
+        log.info("Copied {} into clipboard using xclip.", clip)
+    else:
+        log.warning("'xclip' is not installed.")
 
 
 def xkey(key: str) -> None:

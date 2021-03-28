@@ -3,7 +3,6 @@ Functions/classes which make use of Python's dynamic nature to inspect a
 program's internals.
 """
 
-
 import inspect
 from os.path import abspath, isfile, realpath
 from pathlib import Path
