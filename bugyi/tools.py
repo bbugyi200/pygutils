@@ -1,3 +1,8 @@
+"""
+Miscellaneous tools, where a "tool" is a function that emulates a script/shell
+command.
+"""
+
 import subprocess as sp
 
 from bugyi import subprocess as bsp
@@ -12,26 +17,6 @@ def get_pass(key: str) -> BResult[str]:
 
     password, _err = out_err_r.ok()
     return Ok(password)
-
-
-def xkey(key: str) -> None:
-    """Wrapper for `xdotool key`"""
-    sp.check_call(["xdotool", "key", key])
-
-
-def xtype(keys: str, *, delay: int = None) -> None:
-    """Wrapper for `xdotool type`
-
-    Args:
-        keys (str): Keys to type.
-        delay (optional): Typing delay.
-    """
-    if delay is None:
-        delay = 150
-
-    keys = keys.strip("\n")
-
-    sp.check_call(["xdotool", "type", "--delay", str(delay), keys])
 
 
 def notify(
@@ -69,3 +54,23 @@ def notify(
     cmd_list.extend(args)
 
     sp.check_call(cmd_list)
+
+
+def xkey(key: str) -> None:
+    """Wrapper for `xdotool key`"""
+    sp.check_call(["xdotool", "key", key])
+
+
+def xtype(keys: str, *, delay: int = None) -> None:
+    """Wrapper for `xdotool type`
+
+    Args:
+        keys (str): Keys to type.
+        delay (optional): Typing delay.
+    """
+    if delay is None:
+        delay = 150
+
+    keys = keys.strip("\n")
+
+    sp.check_call(["xdotool", "type", "--delay", str(delay), keys])
