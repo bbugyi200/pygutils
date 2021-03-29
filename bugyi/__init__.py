@@ -2,7 +2,7 @@
 #
 # DEPRECIATED: Use `from bugyi import <MODULE>` or `from bugyi.<MODULE>
 # import <NAME>` instead.
-from bugyi import colors, debug, io, logging, xdg
+from bugyi import debug, io, logging, xdg
 
 # For accessing core functions/classes via `from bugyi import <NAME>`.
 #
@@ -19,18 +19,18 @@ from bugyi.core import (
     signal,
 )
 
-# For accessing tools.py functions via `from bugyi import <TOOL>`.
-#
-# DEPRECIATED: Import directly from the 'bugyi.tools' module instead.
-from bugyi.tools import notify, xkey, xtype
-
 # For accessing subprocess functions/classes via `from bugyi import <NAME>`.
 #
 # DEPRECIATED: Use 'from bugyi import subprocess as bsp' instead.
 from bugyi.subprocess import create_pidfile, StillAliveException
 
+# For accessing tools.py functions via `from bugyi import <TOOL>`.
+#
+# DEPRECIATED: Import directly from the 'bugyi.tools' module instead.
+from bugyi.tools import notify, xkey, xtype
+
 
 # For accessing the colors modules via `from bugyi import colorize`.
 #
-# DEPRECIATED: Use `from bugyi import colors` instead.
-colorize = colors
+# DEPRECIATED: Use `from bugyi.io import colors` instead.
+from bugyi.io import colors as colorize

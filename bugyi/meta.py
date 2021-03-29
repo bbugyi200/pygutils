@@ -14,11 +14,6 @@ def cname(obj: object) -> str:
     return obj.__class__.__name__
 
 
-def scriptname(*, up: int = 0) -> str:
-    frame = inspect.stack()[up + 1]
-    return Path(frame.filename).stem
-
-
 class Inspector:
     """
     Helper class for python introspection (e.g. What line number is this?)
@@ -53,3 +48,8 @@ def _path_to_module(path: str) -> str:
 
     P = P.replace("/", ".")
     return P
+
+
+def scriptname(*, up: int = 0) -> str:
+    frame = inspect.stack()[up + 1]
+    return Path(frame.filename).stem
