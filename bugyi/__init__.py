@@ -20,7 +20,7 @@ from bugyi.core import (
 
 # For accessing ArgumentParser via `from bugyi import ArgumentParser`.
 #
-# DEPRECIATED: Use `from bugyi.cli import ArgumentParser` instead.
+# DEPRECIATED: Use `from bugyi import cli` instead.
 from bugyi.cli import ArgumentParser
 
 # For accessing subprocess functions/classes via `from bugyi import <NAME>`.
@@ -30,10 +30,5 @@ from bugyi.subprocess import create_pidfile, StillAliveException
 
 # For accessing tools.py functions via `from bugyi import <TOOL>`.
 #
-# DEPRECIATED: Import directly from the 'bugyi.tools' module instead.
+# DEPRECIATED: Use `from bugyi.tools import <TOOL>` instead.
 from bugyi.tools import notify, xkey, xtype
-
-# For accessing the colors modules via `from bugyi import colorize`.
-#
-# DEPRECIATED: Use `from bugyi.io import colors` instead.
-from bugyi.io import colors as colorize
