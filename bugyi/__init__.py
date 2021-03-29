@@ -2,13 +2,12 @@
 #
 # DEPRECIATED: Use `from bugyi import <MODULE>` or `from bugyi.<MODULE>
 # import <NAME>` instead.
-from bugyi import debug, io, logging, xdg
+from bugyi import core, debug, io, logging, xdg
 
 # For accessing core functions/classes via `from bugyi import <NAME>`.
 #
 # DEPRECIATED: Use 'from bugyi.core import <NAME>' instead.
 from bugyi.core import (
-    ArgumentParser,
     catch,
     create_dir,
     efill,
@@ -19,6 +18,11 @@ from bugyi.core import (
     signal,
 )
 
+# For accessing ArgumentParser via `from bugyi import ArgumentParser`.
+#
+# DEPRECIATED: Use `from bugyi.cli import ArgumentParser` instead.
+from bugyi.cli import ArgumentParser
+
 # For accessing subprocess functions/classes via `from bugyi import <NAME>`.
 #
 # DEPRECIATED: Use 'from bugyi import subprocess as bsp' instead.
@@ -28,7 +32,6 @@ from bugyi.subprocess import create_pidfile, StillAliveException
 #
 # DEPRECIATED: Import directly from the 'bugyi.tools' module instead.
 from bugyi.tools import notify, xkey, xtype
-
 
 # For accessing the colors modules via `from bugyi import colorize`.
 #

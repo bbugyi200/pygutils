@@ -1,7 +1,5 @@
-import argparse
 import atexit
 import errno
-import inspect
 import os
 import random
 import signal as sig
@@ -9,7 +7,7 @@ import string
 import subprocess as sp
 import sys
 from textwrap import wrap
-from typing import Any, Callable, Iterator, Sequence, TypeVar
+from typing import Callable, Iterator, Sequence, TypeVar
 
 from loguru import logger as log
 
@@ -17,30 +15,6 @@ from bugyi.types import Protocol
 
 
 _T = TypeVar("_T")
-
-
-def ArgumentParser(
-    *args: Any, description: Any = None, **kwargs: Any
-) -> argparse.ArgumentParser:
-    """Wrapper for argparse.ArgumentParser."""
-    if description is None:
-        try:
-            frame = inspect.stack()[1].frame
-            description = frame.f_globals["__doc__"]
-        except KeyError:
-            pass
-
-    parser = argparse.ArgumentParser(  # type: ignore
-        *args, description=description, **kwargs
-    )
-    parser.add_argument(
-        "-d", "--debug", action="store_true", help="Enable debugging mode."
-    )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose output."
-    )
-
-    return parser
 
 
 def catch(func: Callable) -> Callable:
