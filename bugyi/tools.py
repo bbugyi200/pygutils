@@ -8,8 +8,12 @@ import subprocess as sp
 from loguru import logger as log
 
 from bugyi import subprocess as bsp
-from bugyi.errors import BResult, Err, Ok
 from bugyi.meta import scriptname
+
+
+def get_secret(key: str) -> str:
+    secret, _err = bsp.safe_popen(["pass", "show", key]).unwrap()
+    return secret
 
 
 def notify(
@@ -47,15 +51,6 @@ def notify(
     cmd_list.extend(args)
 
     sp.check_call(cmd_list)
-
-
-def pass_show(key: str) -> BResult[str]:
-    out_err_r = bsp.safe_popen(["pass", "show", key])
-    if isinstance(out_err_r, Err):
-        return out_err_r
-
-    password, _err = out_err_r.ok()
-    return Ok(password)
 
 
 def xclip_copy(clip: str) -> None:

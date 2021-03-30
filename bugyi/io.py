@@ -52,10 +52,10 @@ def _color_factory(N: int) -> Callable[[str], str]:
 
 class colors:
     black = _color_factory(30)
-    red = _color_factory(31)
-    green = _color_factory(32)
-    yellow = _color_factory(33)
     blue = _color_factory(34)
-    magenta = _color_factory(35)
     cyan = _color_factory(36)
+    green = _color_factory(32)
+    magenta = _color_factory(35)
+    red = _color_factory(31)
     white = _color_factory(37)
+    yellow = _color_factory(33)

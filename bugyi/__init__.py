@@ -2,7 +2,7 @@
 #
 # DEPRECIATED: Use `from bugyi import <MODULE>` or `from bugyi.<MODULE>
 # import <NAME>` instead.
-from bugyi import core, debug, io, logging, xdg
+from bugyi import debug, io, logging, xdg
 
 # For accessing core functions/classes via `from bugyi import <NAME>`.
 #
