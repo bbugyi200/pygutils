@@ -19,15 +19,15 @@ except ImportError:
     except ImportError:
         _T = TypeVar("_T")
 
-        class _FinalMock(type):
-            def __getitem__(cls, key: Type[_T]) -> Type[_T]:
+        class _FinalMock:
+            def __getitem__(self, key: Type[_T]) -> Type[_T]:
                 return key
 
         class _ProtocolMock(type):
             def __getitem__(cls, _key: Any) -> "_ProtocolMock":
                 return cls
 
-        Final = _FinalMock("Final", (object,), {})  # type: ignore
+        Final = _FinalMock()  # type: ignore
         Literal = defaultdict(lambda: str)  # type: ignore
         Protocol = _ProtocolMock("Protocol", (object,), {})  # type: ignore
 
