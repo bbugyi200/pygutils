@@ -1,8 +1,15 @@
 """Helper functions for command-line argument parsing."""
 
 import argparse
+from dataclasses import dataclass
 import inspect
 from typing import Any
+
+
+@dataclass
+class Arguments:
+    debug: bool
+    verbose: int
 
 
 def ArgumentParser(
