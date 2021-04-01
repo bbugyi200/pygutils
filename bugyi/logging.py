@@ -20,6 +20,9 @@ def configure(
     if verbose is None:
         verbose = 0
 
+    if debug:
+        verbose += 1
+
     # In case __file__ is used...
     basename = os.path.basename(name).replace(".py", "")
 
@@ -41,9 +44,9 @@ def configure(
         sink=f"/var/tmp/{basename}.log", format=fformat, rotation="1 day"
     )
 
-    if debug and bool(verbose) or verbose > 1:
+    if verbose > 1:
         stream_h["level"] = file_h["level"] = "TRACE"
-    elif debug and not bool(verbose) or verbose > 0:
+    elif verbose > 0:
         stream_h["level"] = file_h["level"] = "DEBUG"
     else:
         stream_h["level"] = "INFO"
