@@ -146,10 +146,12 @@ def main_factory(
         args = parse_cli_args(argv)
 
         debug: bool = getattr(args, "debug", False)
-        verbose: bool = getattr(args, "verbose", False)
+        verbose: int = getattr(args, "verbose", 0)
         name = scriptname(up=1)
 
         configure_logging(name, debug=debug, verbose=verbose)
+
+        log.trace("Trace mode has been enabled.")
         log.debug("args = {!r}", args)
 
         try:

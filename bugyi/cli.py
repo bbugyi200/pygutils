@@ -20,10 +20,19 @@ def ArgumentParser(
         *args, description=description, **kwargs
     )
     parser.add_argument(
-        "-d", "--debug", action="store_true", help="Enable debugging mode."
+        "-d",
+        "--debug",
+        action="store_true",
+        help="Enable debugging mode. DEPRECIATED: Use --verbose instead.",
     )
     parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose output."
+        "-v",
+        "--verbose",
+        action="count",
+        help=(
+            "How verbose should the output be? This option can be specified"
+            " multiple times."
+        ),
     )
 
     return parser

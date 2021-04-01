@@ -5,15 +5,23 @@ import inspect
 import os
 import sys
 import types
-from typing import List, Mapping
+from typing import List, Mapping, Optional
 
 from loguru import logger as log
 
 
-def configure(name: str, *, debug: bool, verbose: bool) -> None:
+def configure(
+    name: str, *, debug: Optional[bool], verbose: Optional[int]
+) -> None:
     """Configure the Logger."""
+    if debug is None:
+        debug = False
+
+    if verbose is None:
+        verbose = 0
+
     # In case __file__ is used...
-    basename = os.path.basename(name).replace('.py', '')
+    basename = os.path.basename(name).replace(".py", "")
 
     def sformat(report: Mapping) -> str:
         verbose = bool("SUPERVISOR_ENABLED" in os.environ)
@@ -27,17 +35,15 @@ def configure(name: str, *, debug: bool, verbose: bool) -> None:
     stream_h = dict(
         sink=sys.stderr,
         format=sformat,
-        filter=lambda record: "quiet" not in record["extra"]
+        filter=lambda record: "quiet" not in record["extra"],
     )
     file_h = dict(
-        sink=f"/var/tmp/{basename}.log",
-        format=fformat,
-        rotation="1 day"
+        sink=f"/var/tmp/{basename}.log", format=fformat, rotation="1 day"
     )
 
-    if debug and verbose:
+    if debug and bool(verbose) or verbose > 1:
         stream_h["level"] = file_h["level"] = "TRACE"
-    elif debug and not verbose:
+    elif debug and not bool(verbose) or verbose > 0:
         stream_h["level"] = file_h["level"] = "DEBUG"
     else:
         stream_h["level"] = "INFO"
@@ -54,8 +60,8 @@ def _formatter(report: Mapping, *, verbose: bool = False) -> List[str]:
     if verbose:
         add_field("{time:YYYY-MM-DD HH:mm:ss}", DATE_STYLE)
     else:
-        _minutes, _seconds = divmod(report['elapsed'].seconds, 60)
-        _milliseconds = report['elapsed'].microseconds // 1000
+        _minutes, _seconds = divmod(report["elapsed"].seconds, 60)
+        _milliseconds = report["elapsed"].microseconds // 1000
         _my_elapsed = f"{_minutes:02}:{_seconds:02}.{_milliseconds:03}"
         add_field(f"{_my_elapsed}", DATE_STYLE)
 
@@ -71,10 +77,11 @@ def _formatter(report: Mapping, *, verbose: bool = False) -> List[str]:
     _loc = f"{report['file']}::{report['function']}::{report['line']}"
     _max_loc_length = max(
         len(_loc),
-        getattr(configure, 'max_loc_length', 0),
-    ); setattr(configure, 'max_loc_length', _max_loc_length)
+        getattr(configure, "max_loc_length", 0),
+    )
+    setattr(configure, "max_loc_length", _max_loc_length)
     _loc_fmt = "{{loc:^{0}}}".format(_max_loc_length)
-    loc = _loc_fmt.format(loc=_loc.replace('<', '\\<'))
+    loc = _loc_fmt.format(loc=_loc.replace("<", "\\<"))
     add_field(loc, ["black", "bold"])
 
     add_field("{message}", ["level"], sep="")
@@ -85,10 +92,7 @@ def _formatter(report: Mapping, *, verbose: bool = False) -> List[str]:
 
 
 def _add_field(
-        fmt_list: List[str],
-        field: str,
-        marks: List[str],
-        sep: str = " | "
+    fmt_list: List[str], field: str, marks: List[str], sep: str = " | "
 ) -> None:
     fmt_list.append(
         f"{''.join(['<' + m + '>' for m in marks])}"
