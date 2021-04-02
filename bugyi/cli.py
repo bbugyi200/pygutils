@@ -6,7 +6,7 @@ import inspect
 from typing import Any
 
 
-@dataclass
+@dataclass(frozen=True)
 class Arguments:
     debug: bool
     verbose: int
@@ -38,7 +38,7 @@ def ArgumentParser(
         action="count",
         help=(
             "How verbose should the output be? This option can be specified"
-            " multiple times."
+            " multiple times (e.g. -v, -vv, -vv, ...)."
         ),
     )
 
