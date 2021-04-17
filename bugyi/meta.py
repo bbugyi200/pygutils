@@ -8,8 +8,11 @@ import inspect
 from os.path import abspath, isfile, realpath
 from pathlib import Path
 import sys
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar
 from warnings import warn
+
+
+_C = TypeVar("_C", bound=Callable)
 
 
 def cname(obj: object) -> str:
@@ -58,13 +61,17 @@ def scriptname(*, up: int = 0) -> str:
     return Path(frame.filename).stem
 
 
-def depreciated(class_or_func: Callable, warn_msg: str) -> Callable:
+def depreciated(class_or_func: _C, warn_msg: str) -> _C:
+    """
+    Used to depreciate @class_or_func after renaming it or moving it to a
+    different module/package.
+    """
     @wraps(class_or_func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         warn(warn_msg, category=BugyiDepreciationWarning, stacklevel=3)
         return class_or_func(*args, **kwargs)
 
-    return wrapper
+    return wrapper  # type: ignore
 
 
 class BugyiDepreciationWarning(Warning):

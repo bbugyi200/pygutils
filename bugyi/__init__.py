@@ -15,10 +15,7 @@ from bugyi.core import (
     shell,
     signal,
 )
-from bugyi.subprocess import (
-    StillAliveException as _StillAliveException,
-    create_pidfile,
-)
+from bugyi.subprocess import StillAliveException, create_pidfile
 from bugyi.tools import notify, xkey, xtype
 
 from bugyi.meta import depreciated
@@ -47,8 +44,8 @@ _SUBPROCESS_WARNING = (
     "Importing '{}' directly from the 'bugyi' package is depreciated. Use"
     " 'from bugyi import subprocess as bsp' instead.".format
 )
-StillAliveException = depreciated(
-    _StillAliveException, _SUBPROCESS_WARNING("StillAliveException")
+StillAliveException = depreciated(  # type: ignore
+    StillAliveException, _SUBPROCESS_WARNING("StillAliveException")
 )
 create_pidfile = depreciated(
     create_pidfile, _SUBPROCESS_WARNING("create_pidfile")
