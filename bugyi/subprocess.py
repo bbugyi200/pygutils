@@ -2,8 +2,8 @@ import os
 import subprocess as sp
 from typing import Any, Iterable, List, Tuple
 
-from bugyi import xdg
-from bugyi.errors import BErr, BResult, BugyiError, Err, Ok
+from . import xdg
+from .errors import BErr, BResult, BugyiError, Err, Ok
 
 
 def safe_popen(

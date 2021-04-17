@@ -2,10 +2,10 @@
 #
 # DEPRECIATED: Use `from bugyi import <MODULE>` or `from bugyi.<MODULE> import
 # <NAME>` instead.
-from bugyi import debug, io, logging, xdg
+from . import debug, io, logging, xdg
 
-from bugyi.cli import ArgumentParser
-from bugyi.core import (
+from .cli import ArgumentParser
+from .core import (
     catch,
     create_dir,
     efill,
@@ -15,10 +15,10 @@ from bugyi.core import (
     shell,
     signal,
 )
-from bugyi.subprocess import StillAliveException, create_pidfile
-from bugyi.tools import notify, xkey, xtype
+from .subprocess import StillAliveException, create_pidfile
+from .tools import notify, xkey, xtype
 
-from bugyi.meta import depreciated
+from .meta import depreciated
 
 
 ArgumentParser = depreciated(

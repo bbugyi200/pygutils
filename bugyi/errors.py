@@ -11,9 +11,9 @@ from typing import (
     Union,
 )
 
-from bugyi.core import efill, ewrap
-from bugyi.meta import Inspector, cname
-from bugyi.types import Protocol
+from .core import efill, ewrap
+from .meta import Inspector, cname
+from .types import Protocol
 
 
 _T = TypeVar("_T")

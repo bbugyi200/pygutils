@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 from typing import Dict, Tuple
 
-from bugyi.meta import scriptname
-from bugyi.types import Literal
+from .meta import scriptname
+from .types import Literal
 
 
 XDG_Type = Literal["cache", "config", "data", "runtime"]

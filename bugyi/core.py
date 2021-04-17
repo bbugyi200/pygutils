@@ -11,7 +11,7 @@ from typing import Callable, Iterator, Sequence, TypeVar
 
 from loguru import logger as log
 
-from bugyi.types import Protocol
+from .types import Protocol
 
 
 _T = TypeVar("_T")

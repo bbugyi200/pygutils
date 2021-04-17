@@ -7,8 +7,8 @@ import subprocess as sp
 
 from loguru import logger as log
 
-from bugyi import subprocess as bsp
-from bugyi.meta import scriptname
+from . import subprocess as bsp  # pylint: disable=reimported
+from .meta import scriptname
 
 
 def get_secret(key: str) -> str:
