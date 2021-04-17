@@ -56,7 +56,7 @@ def mkfifo(FIFO_PATH: str) -> None:
 
 def secret() -> str:
     """Get Secret String for Use with secret.sh Script"""
-    from bugyi.meta import scriptname
+    from .meta import scriptname
 
     secret_key = "".join(
         random.choice(string.ascii_letters + string.digits) for _ in range(16)
@@ -136,8 +136,8 @@ def main_factory(
     """
     Returns a generic main() function to be used as a script's entry point.
     """
-    from bugyi.logging import configure as configure_logging
-    from bugyi.meta import scriptname
+    from .logging import configure as configure_logging
+    from .meta import scriptname
 
     def main(argv: Sequence[str] = None) -> int:
         if argv is None:
