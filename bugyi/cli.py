@@ -36,9 +36,10 @@ def ArgumentParser(
         "-v",
         "--verbose",
         action="count",
+        default=0,
         help=(
             "How verbose should the output be? This option can be specified"
-            " multiple times (e.g. -v, -vv, -vv, ...)."
+            " multiple times (e.g. -v, -vv, -vvv, ...)."
         ),
     )
 

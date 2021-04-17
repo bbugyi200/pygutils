@@ -7,7 +7,7 @@ from bugyi.errors import BErr, BResult, BugyiError, Err, Ok
 
 
 def safe_popen(
-    cmd_parts: Iterable[str], **kwargs: Any
+    cmd_parts: Iterable[str], *, up: int = 0, **kwargs: Any
 ) -> BResult[Tuple[str, str]]:
     """Wrapper for subprocess.Popen(...).
 
@@ -25,7 +25,7 @@ def safe_popen(
 
     proc = DoneProcess(ps, cmd_list)
     if ps.returncode != 0:
-        return proc.to_error(up=1)
+        return proc.to_error(up=up + 1)
 
     return Ok((proc.out, proc.err))
 
@@ -61,7 +61,7 @@ class DoneProcess:
         self.out = "" if stdout is None else str(stdout.decode().strip())
         self.err = "" if stderr is None else str(stderr.decode().strip())
 
-    def to_error(self, up: int = 0) -> Err[BugyiError]:
+    def to_error(self, *, up: int = 0) -> Err[BugyiError]:
         maybe_out = ""
         if self.out:
             maybe_out = "\n\n----- STDOUT\n{}".format(self.out)

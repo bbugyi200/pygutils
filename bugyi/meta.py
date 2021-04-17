@@ -3,10 +3,13 @@ Functions/classes which make use of Python's dynamic nature to inspect a
 program's internals.
 """
 
+from functools import wraps
 import inspect
 from os.path import abspath, isfile, realpath
 from pathlib import Path
 import sys
+from typing import Any, Callable
+from warnings import warn
 
 
 def cname(obj: object) -> str:
@@ -53,3 +56,16 @@ def _path_to_module(path: str) -> str:
 def scriptname(*, up: int = 0) -> str:
     frame = inspect.stack()[up + 1]
     return Path(frame.filename).stem
+
+
+def depreciated(class_or_func: Callable, warn_msg: str) -> Callable:
+    @wraps(class_or_func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        warn(warn_msg, category=BugyiDepreciationWarning, stacklevel=3)
+        return class_or_func(*args, **kwargs)
+
+    return wrapper
+
+
+class BugyiDepreciationWarning(Warning):
+    """DepreciationWarning that doesn't get ignored by default."""

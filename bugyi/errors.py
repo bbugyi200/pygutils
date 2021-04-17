@@ -77,8 +77,7 @@ def init_err_helper(Error: Type[_E]) -> _ErrHelper[_E]:
 
 
 class BugyiError(Exception):
-    def __init__(self, emsg, **kwargs):
-        # type: (str, Any) -> None
+    def __init__(self, emsg: str, **kwargs: Any) -> None:
         cause = kwargs.get("cause", None)
         assert issubclass(type(cause), (type(None), Exception))
 
@@ -94,12 +93,10 @@ class BugyiError(Exception):
 
         super().__init__(emsg)
 
-    def __repr__(self):
-        # type: () -> str
+    def __repr__(self) -> str:
         return self._repr()
 
-    def _repr(self, width=80):
-        # type: (Optional[int]) -> str
+    def _repr(self, width: Optional[int] = 80) -> str:
         """
         Format error to width.  If width is None, return string suitable for
         traceback.
@@ -124,8 +121,7 @@ class BugyiError(Exception):
             emsg,
         )
 
-    def __iter__(self):
-        # type: () -> Iterator[BaseException]
+    def __iter__(self) -> Iterator[BaseException]:
         yield self
 
         e = self.__cause__
@@ -133,8 +129,7 @@ class BugyiError(Exception):
             yield e
             e = e.__cause__
 
-    def report(self, width=80):
-        # type: (int) -> ErrorReport
+    def report(self, width: int = 80) -> "ErrorReport":
         """
         Return an ErrorReport object formatting the current state of this
         BugyiError
@@ -190,30 +185,22 @@ class BugyiError(Exception):
         return report
 
 
-BErr = init_err_helper(BugyiError)
-BResult = Result[_T, BugyiError]
-
-
 class ErrorReport:
-    def __init__(self, chunk=None, border_ch="|"):
-        # type: (str, str) -> None
+    def __init__(self, chunk: str = None, border_ch: str = "|") -> None:
         self.report_lines = []  # type: List[_ErrorReportLine]
         self.border_ch = border_ch
         if chunk is not None:
             self._add_chunk(chunk)
 
-    def __str__(self):
-        # type: () -> str
+    def __str__(self) -> str:
         self._close_borders()
         return "".join(rl.line + rl.newlines for rl in self.report_lines)
 
-    def __iadd__(self, chunk):
-        # type: (str) -> ErrorReport
+    def __iadd__(self, chunk: str) -> "ErrorReport":
         self._add_chunk(chunk)
         return self
 
-    def _add_chunk(self, chunk):
-        # type: (str) -> None
+    def _add_chunk(self, chunk: str) -> None:
         if not chunk:
             return
 
@@ -230,8 +217,7 @@ class ErrorReport:
                 rline = _ErrorReportLine(line, "")
                 self.report_lines.append(rline)
 
-    def _close_borders(self):
-        # type: () -> None
+    def _close_borders(self) -> None:
         for i, rline in enumerate(self.report_lines[:]):
             V_CH = self.border_ch
             if not rline.line:
@@ -253,20 +239,21 @@ class ErrorReport:
 
 
 class _ErrorReportLine:
-    def __init__(self, line, newlines):
-        # type: (str, str) -> None
+    def __init__(self, line: str, newlines: str) -> None:
         self.line = line
         self.newlines = newlines
 
-    def __str__(self):
-        # type: () -> str
+    def __str__(self) -> str:
         return "{}(line={!r}, newlines={!r})".format(
             cname(self), self.line, self.newlines
         )
 
 
-def _tb_or_repr(e, width):
-    # type: (BaseException, Optional[int]) -> str
+BErr = init_err_helper(BugyiError)
+BResult = Result[_T, BugyiError]
+
+
+def _tb_or_repr(e: BaseException, width: Optional[int]) -> str:
     if isinstance(e, BugyiError):
         return e._repr(width=width)
     else:
@@ -278,8 +265,7 @@ def _tb_or_repr(e, width):
         return estring
 
 
-def chain_errors(e1, e2):
-    # type: (_E, Optional[Exception]) -> _E
+def chain_errors(e1: _E, e2: Optional[Exception]) -> _E:
     e = e1
     while getattr(e, "__cause__", None):
         e = getattr(e, "__cause__")

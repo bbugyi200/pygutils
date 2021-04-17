@@ -164,7 +164,7 @@ def main_factory(
                 "An unrecoverable error has been raised. Terminating {}...",
                 name,
             )
-            raise
+            return 1
         else:
             return status
 
