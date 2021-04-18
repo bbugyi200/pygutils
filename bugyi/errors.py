@@ -11,7 +11,7 @@ from typing import (
     Union,
 )
 
-from .core import efill, ewrap
+from .io import efill, ewrap
 from .meta import Inspector, cname
 from .types import Protocol
 

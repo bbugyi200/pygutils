@@ -44,9 +44,6 @@ _SUBPROCESS_WARNING = (
     "Importing '{}' directly from the 'bugyi' package is depreciated. Use"
     " 'from bugyi import subprocess as bsp' instead.".format
 )
-StillAliveException = depreciated(  # type: ignore
-    StillAliveException, _SUBPROCESS_WARNING("StillAliveException")
-)
 create_pidfile = depreciated(
     create_pidfile, _SUBPROCESS_WARNING("create_pidfile")
 )

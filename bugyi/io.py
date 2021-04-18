@@ -1,7 +1,8 @@
 import sys
 import termios
+from textwrap import wrap
 import tty
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
 
 def getch(prompt: str = None) -> str:
@@ -59,3 +60,30 @@ class colors:
     red = _color_factory(31)
     white = _color_factory(37)
     yellow = _color_factory(33)
+
+
+def ewrap(
+    multiline_msg: str, width: int = 80, indent: int = 0
+) -> Iterator[str]:
+    """A better version of textwrap.wrap()."""
+    for msg in multiline_msg.split("\n"):
+        if not msg:
+            yield ""
+            continue
+
+        msg = (" " * indent) + msg
+
+        i = 0
+        while i < len(msg) and msg[i] == " ":
+            i += 1
+
+        spaces = " " * i
+        for m in wrap(
+            msg, width, subsequent_indent=spaces, drop_whitespace=True
+        ):
+            yield m
+
+
+def efill(multiline_msg: str, width: int = 80, indent: int = 0) -> str:
+    """A better version of textwrap.fill()."""
+    return "\n".join(ewrap(multiline_msg, width, indent))

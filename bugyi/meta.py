@@ -61,15 +61,15 @@ def scriptname(*, up: int = 0) -> str:
     return Path(frame.filename).stem
 
 
-def depreciated(class_or_func: _C, warn_msg: str) -> _C:
+def depreciated(func: _C, wmsg: str) -> _C:
     """
-    Used to depreciate @class_or_func after renaming it or moving it to a
+    Used to depreciate @func after renaming it or moving it to a
     different module/package.
     """
-    @wraps(class_or_func)
+    @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
-        warn(warn_msg, category=BugyiDepreciationWarning, stacklevel=3)
-        return class_or_func(*args, **kwargs)
+        warn(wmsg, category=BugyiDepreciationWarning, stacklevel=3)
+        return func(*args, **kwargs)
 
     return wrapper  # type: ignore
 

@@ -1,3 +1,12 @@
+"""
+Functions/classes that we were unable to match to a category are placed in this
+module. Thus, you should only add code to this module when you are unable to
+find ANY other module to add it to.
+
+WARNING: This module probably shouldn't be imported from other modules in this
+package.
+"""
+
 import atexit
 import errno
 import os
@@ -6,14 +15,16 @@ import signal as sig
 import string
 import subprocess as sp
 import sys
-from textwrap import wrap
-from typing import Callable, Iterator, Sequence, TypeVar
+from typing import Callable, Sequence, TypeVar
 
 from loguru import logger as log
 
+from .io import efill, ewrap
+from .meta import depreciated
 from .types import Protocol
 
 
+_C = TypeVar("_C", bound=Callable)
 _T = TypeVar("_T")
 
 
@@ -98,33 +109,6 @@ def signal(*signums: int) -> Callable:
     return _signal
 
 
-def ewrap(
-    multiline_msg: str, width: int = 80, indent: int = 0
-) -> Iterator[str]:
-    """A better version of textwrap.wrap()."""
-    for msg in multiline_msg.split("\n"):
-        if not msg:
-            yield ""
-            continue
-
-        msg = (" " * indent) + msg
-
-        i = 0
-        while i < len(msg) and msg[i] == " ":
-            i += 1
-
-        spaces = " " * i
-        for m in wrap(
-            msg, width, subsequent_indent=spaces, drop_whitespace=True
-        ):
-            yield m
-
-
-def efill(multiline_msg: str, width: int = 80, indent: int = 0) -> str:
-    """A better version of textwrap.fill()."""
-    return "\n".join(ewrap(multiline_msg, width, indent))
-
-
 class _MainType(Protocol):
     def __call__(self, argv: Sequence[str] = None) -> int:
         pass
@@ -169,3 +153,16 @@ def main_factory(
             return status
 
     return main
+
+
+def _depreciated_io(io_func: _C) -> _C:
+    name = io_func.__name__
+    wmsg = (
+        f"The '{name}' function should not be imported from the 'core' module."
+        f" Use 'from {__package__}.io import {name}' instead."
+    )
+    return depreciated(io_func, wmsg)
+
+
+efill = _depreciated_io(efill)
+ewrap = _depreciated_io(ewrap)
