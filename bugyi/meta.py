@@ -68,7 +68,7 @@ def depreciated(func: _C, wmsg: str) -> _C:
     """
     @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
-        warn(wmsg, category=BugyiDepreciationWarning, stacklevel=3)
+        warn(wmsg, category=BugyiDepreciationWarning, stacklevel=2)
         return func(*args, **kwargs)
 
     return wrapper  # type: ignore
