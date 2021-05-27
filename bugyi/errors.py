@@ -83,9 +83,6 @@ class safe_command(Generic[_E]):
         self._kwargs = kwargs
         return self
 
-    def _call_func(self) -> Result[None, _E]:
-        return self._func(*self._args, **self._kwargs)
-
     def error(self) -> Optional[_E]:
         result = self._call_func()
         if isinstance(result, Err):
@@ -94,6 +91,9 @@ class safe_command(Generic[_E]):
 
     def unwrap(self) -> None:
         return self._call_func().unwrap()
+
+    def _call_func(self) -> Result[None, _E]:
+        return self._func(*self._args, **self._kwargs)
 
 
 class _ErrHelper(Protocol[_E]):
