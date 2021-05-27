@@ -55,7 +55,9 @@ class Err(Generic[_E]):
 
 
 def _result_bool(self: "Result") -> NoReturn:
-    raise ValueError(f"An {cname(self)} object can NOT be used as a boolean.")
+    raise ValueError(
+        f"An {cname(self)} object cannot be evaluated as a boolean."
+    )
 
 
 # The 'Result' return type is used to implement an error-handling model heavily
