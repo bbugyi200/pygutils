@@ -61,9 +61,9 @@ def scriptname(*, up: int = 0) -> str:
     return Path(frame.filename).stem
 
 
-def depreciated(func: _C, wmsg: str) -> _C:
+def deprecated(func: _C, wmsg: str) -> _C:
     """
-    Used to depreciate @func after renaming it or moving it to a
+    Used to deprecate @func after renaming it or moving it to a
     different module/package.
     """
     @wraps(func)

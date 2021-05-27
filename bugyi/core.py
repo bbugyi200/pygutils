@@ -20,7 +20,7 @@ from typing import Callable, Sequence, TypeVar
 from loguru import logger as log
 
 from .io import efill, ewrap
-from .meta import depreciated
+from .meta import deprecated
 from .types import Protocol
 
 
@@ -31,7 +31,7 @@ _T = TypeVar("_T")
 def catch(func: Callable) -> Callable:
     """Wrapper for loguru.logger.catch
 
-    DEPRECIATED: Use the main_factory() function instead.
+    DEPRECATED: Use the main_factory() function instead.
     """
     catcher = log.bind(quiet=True)
     return catcher.catch(
@@ -91,7 +91,7 @@ def secret() -> str:
 def shell(*cmds: str) -> str:
     """Run Shell Command(s)
 
-    DEPRECIATED: Use the bugyi.subprocess module's functions instead.
+    DEPRECATED: Use the bugyi.subprocess module's functions instead.
     """
     out = sp.check_output("; ".join(cmds), shell=True)
     return out.decode().strip()
@@ -155,14 +155,14 @@ def main_factory(
     return main
 
 
-def _depreciated_io(io_func: _C) -> _C:
+def _deprecated_io(io_func: _C) -> _C:
     name = io_func.__name__
     wmsg = (
         f"The '{name}' function should not be imported from the 'core' module."
         f" Use 'from {__package__}.io import {name}' instead."
     )
-    return depreciated(io_func, wmsg)
+    return deprecated(io_func, wmsg)
 
 
-efill = _depreciated_io(efill)
-ewrap = _depreciated_io(ewrap)
+efill = _deprecated_io(efill)
+ewrap = _deprecated_io(ewrap)

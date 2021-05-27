@@ -27,6 +27,9 @@ class Ok(Generic[_T]):
     def __repr__(self) -> str:
         return f"{cname(self)}({self.ok()!r})"
 
+    def __bool__(self) -> NoReturn:
+        _result_bool(self)
+
     def ok(self) -> _T:
         return self._value
 
@@ -41,11 +44,18 @@ class Err(Generic[_E]):
     def __repr__(self) -> str:
         return f"{cname(self)}(\n{efill(str(self.err()), indent=2)}\n)"
 
+    def __bool__(self) -> NoReturn:
+        _result_bool(self)
+
     def err(self) -> _E:
         return self._e
 
     def unwrap(self) -> NoReturn:
         raise self.err()
+
+
+def _result_bool(self: "Result") -> NoReturn:
+    raise ValueError(f"An {cname(self)} object can NOT be used as a boolean.")
 
 
 # The 'Result' return type is used to implement an error-handling model heavily
