@@ -70,24 +70,30 @@ def _result_bool(self: Result) -> NoReturn:
     )
 
 
-class command(Generic[_E]):
+class safe_command(Generic[_E]):
     def __init__(self, func: Callable[..., Result[None, _E]]) -> None:
-        self.func = func
-        self.args: Tuple[Any, ...] = ()
-        self.kwargs: Dict[str, Any] = {}
+        self._func = func
+        self._args: Tuple[Any, ...] = ()
+        self._kwargs: Dict[str, Any] = {}
 
         update_wrapper(self, func)
 
-    def __call__(self, *args: Any, **kwargs: Any) -> "command[_E]":
-        self.args = args
-        self.kwargs = kwargs
+    def __call__(self, *args: Any, **kwargs: Any) -> "safe_command[_E]":
+        self._args = args
+        self._kwargs = kwargs
         return self
 
-    def result(self) -> Result[None, _E]:
-        return self.func(*self.args, **self.kwargs)
+    def _call_func(self) -> Result[None, _E]:
+        return self._func(*self._args, **self._kwargs)
+
+    def error(self) -> Optional[_E]:
+        result = self._call_func()
+        if isinstance(result, Err):
+            return result.err()
+        return None
 
     def unwrap(self) -> None:
-        return self.result().unwrap()
+        return self._call_func().unwrap()
 
 
 class _ErrHelper(Protocol[_E]):
