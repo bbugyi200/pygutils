@@ -1,11 +1,15 @@
+from functools import update_wrapper
 import traceback
 from typing import (
     Any,
+    Callable,
+    Dict,
     Generic,
     Iterator,
     List,
     NoReturn,
     Optional,
+    Tuple,
     Type,
     TypeVar,
     Union,
@@ -54,16 +58,36 @@ class Err(Generic[_E]):
         raise self.err()
 
 
-def _result_bool(self: "Result") -> NoReturn:
+# The 'Result' return type is used to implement an error-handling model heavily
+# influenced by that used by the Rust programming language
+# (see https://doc.rust-lang.org/book/ch09-00-error-handling.html).
+Result = Union[Ok[_T], Err[_E]]
+
+
+def _result_bool(self: Result) -> NoReturn:
     raise ValueError(
         f"An {cname(self)} object cannot be evaluated as a boolean."
     )
 
 
-# The 'Result' return type is used to implement an error-handling model heavily
-# influenced by that used by the Rust programming language
-# (see https://doc.rust-lang.org/book/ch09-00-error-handling.html).
-Result = Union[Ok[_T], Err[_E]]
+class command(Generic[_E]):
+    def __init__(self, func: Callable[..., Result[None, _E]]) -> None:
+        self.func = func
+        self.args: Tuple[Any, ...] = ()
+        self.kwargs: Dict[str, Any] = {}
+
+        update_wrapper(self, func)
+
+    def __call__(self, *args: Any, **kwargs: Any) -> "command[_E]":
+        self.args = args
+        self.kwargs = kwargs
+        return self
+
+    def result(self) -> Result[None, _E]:
+        return self.func(*self.args, **self.kwargs)
+
+    def unwrap(self) -> None:
+        return self.result().unwrap()
 
 
 class _ErrHelper(Protocol[_E]):
