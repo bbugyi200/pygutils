@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from functools import wraps
 from typing import (
     Any,
@@ -19,15 +20,30 @@ _T = TypeVar("_T")
 _E = TypeVar("_E", bound=Exception)
 
 
-class Ok(Generic[_T]):
+class _ResultMixin(ABC):
+    def __bool__(self) -> NoReturn:
+        raise ValueError(
+            f"{cname(self)} object cannot be evaluated as a boolean. This is"
+            " probably a bug in your code. Make sure you are either"
+            " explicitly checking for Err results or using the"
+            f" `Result.unwrap()` method: {self!r}"
+        )
+
+    @abstractmethod
+    def err(self) -> Optional[Exception]:
+        pass
+
+    @abstractmethod
+    def unwrap(self) -> Any:
+        pass
+
+
+class Ok(Generic[_T], _ResultMixin):
     def __init__(self, value: _T) -> None:
         self._value = value
 
     def __repr__(self) -> str:
         return f"{cname(self)}({self.ok()!r})"
-
-    def __bool__(self) -> NoReturn:
-        _raise_bool_error(self)
 
     @staticmethod
     def err() -> None:
@@ -40,15 +56,12 @@ class Ok(Generic[_T]):
         return self.ok()
 
 
-class Err(Generic[_E]):
+class Err(Generic[_E], _ResultMixin):
     def __init__(self, e: _E) -> None:
         self._e = e
 
     def __repr__(self) -> str:
         return f"{cname(self)}(\n{efill(str(self.err()), indent=2)}\n)"
-
-    def __bool__(self) -> NoReturn:
-        _raise_bool_error(self)
 
     def err(self) -> _E:
         return self._e
@@ -73,7 +86,7 @@ def return_lazy_result(
     return wrapper
 
 
-class _LazyResult(Generic[_T, _E]):
+class _LazyResult(Generic[_T, _E], _ResultMixin):
     def __init__(
         self, func: Callable[..., Result[_T, _E]], *args: Any, **kwargs: Any
     ) -> None:
@@ -82,9 +95,6 @@ class _LazyResult(Generic[_T, _E]):
         self._kwargs: Dict[str, Any] = kwargs
 
         self._result: Optional[Result[_T, _E]] = None
-
-    def __bool__(self) -> NoReturn:
-        _raise_bool_error(self)
 
     def result(self) -> Result[_T, _E]:
         if self._result is None:
@@ -96,12 +106,3 @@ class _LazyResult(Generic[_T, _E]):
 
     def unwrap(self) -> _T:
         return self.result().unwrap()
-
-
-def _raise_bool_error(self: Any) -> NoReturn:
-    raise NotImplementedError(
-        f"{cname(self)} object ({self!r}) cannot be evaluated as a boolean."
-        " This is probably a bug in your code. Make sure you are either"
-        " explicitly checking for Err results or using the `Result.unwrap()`"
-        " method."
-    )
