@@ -265,7 +265,7 @@ class _ErrorReportLine:
 
 
 def BErr(emsg: str, cause: Exception = None, up: int = 0) -> Err[BugyiError]:
-    e = BugyiError(emsg, cause=cause, up=up)
+    e = BugyiError(emsg, cause=cause, up=up + 1)
     return Err(e)
 
 
