@@ -1,22 +1,21 @@
 import traceback
-from typing import Any, Iterator, List, Optional, TypeVar
-from warnings import warn
+from typing import Iterator, List, Optional, TypeVar
 
 from .io import efill, ewrap
-from .meta import BugyiDepreciationWarning, Inspector, cname
-from .result import Err as result_Err, Ok as result_Ok, Result
+from .meta import Inspector, cname
+from .result import Err as Err_, Result as Result_
 
 
 _T = TypeVar("_T")
 _E = TypeVar("_E", bound=Exception)
-BResult = Result[_T, "BugyiError"]
+BResult = Result_[_T, "BugyiError"]
 
 
 def BErr(
     emsg: str, cause: Exception = None, up: int = 0
-) -> result_Err["BugyiError"]:
+) -> Err_["BugyiError"]:
     e = BugyiError(emsg, cause=cause, up=up + 1)
-    return result_Err(e)
+    return Err_(e)
 
 
 class BugyiError(Exception):
@@ -192,24 +191,3 @@ def chain_errors(e1: _E, e2: Optional[Exception]) -> _E:
         e = getattr(e, "__cause__")
     setattr(e, "__cause__", e2)
     return e1
-
-
-class Ok(result_Ok):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        _ok_err_warning("Ok")
-        super().__init__(*args, **kwargs)
-
-
-class Err(result_Err):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        _ok_err_warning("Err")
-        super().__init__(*args, **kwargs)
-
-
-def _ok_err_warning(ok_err: str) -> None:
-    warn(
-        f"Importing '{ok_err}' from the bugyi/errors.py module is deprecated."
-        f" Use 'from bugyi.result import {ok_err}' instead.",
-        category=BugyiDepreciationWarning,
-        stacklevel=3,
-    )
