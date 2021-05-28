@@ -3,7 +3,8 @@ import subprocess as sp
 from typing import Any, Iterable, List, Tuple
 
 from . import xdg
-from .errors import BErr, BResult, BugyiError, Err, Ok
+from .errors import BErr, BResult, BugyiError
+from .result import Err, Ok
 
 
 def safe_popen(
