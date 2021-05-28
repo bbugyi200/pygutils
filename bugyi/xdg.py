@@ -2,12 +2,13 @@
 
 import os
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Callable, Dict, Tuple, TypeVar
 
-from .meta import scriptname
+from .meta import deprecated, scriptname
 from .types import Literal
 
 
+_C = TypeVar("_C", bound=Callable)
 XDG_Type = Literal["cache", "config", "data", "runtime"]
 
 _home = os.environ.get("HOME")
@@ -59,6 +60,13 @@ def get_base_dir(xdg_type: XDG_Type) -> Path:
     return xdg_dir
 
 
-# DEPRECIATED: Use newer, more descriptive function names instead.
-init = init_full_dir
-get = get_base_dir
+def _deprecated_func(old_name: str, func: _C) -> _C:
+    return deprecated(
+        func,
+        f"The '{old_name}' function is deprecated. Use the '{func.__name__}'"
+        " function instead.",
+    )
+
+
+init = _deprecated_func("init", init_full_dir)
+get = _deprecated_func("get", get_base_dir)
