@@ -74,7 +74,7 @@ def _raise_bool_error(self: Result) -> NoReturn:
     )
 
 
-class _SafeResult(Generic[_T, _E]):
+class _LazyResult(Generic[_T, _E]):
     def __init__(
         self, func: Callable[..., Result[_T, _E]], *args: Any, **kwargs: Any
     ) -> None:
@@ -92,12 +92,12 @@ class _SafeResult(Generic[_T, _E]):
         return self.result().unwrap()
 
 
-def return_safe_result(
+def return_lazy_result(
     func: Callable[..., Result[_T, _E]]
-) -> Callable[..., _SafeResult[_T, _E]]:
+) -> Callable[..., _LazyResult[_T, _E]]:
     @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> _SafeResult[_T, _E]:
-        return _SafeResult(func, *args, **kwargs)
+    def wrapper(*args: Any, **kwargs: Any) -> _LazyResult[_T, _E]:
+        return _LazyResult(func, *args, **kwargs)
 
     return wrapper
 
