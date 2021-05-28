@@ -1,4 +1,4 @@
-from functools import update_wrapper
+from functools import wraps
 import traceback
 from typing import (
     Any,
@@ -33,6 +33,10 @@ class Ok(Generic[_T]):
 
     def __bool__(self) -> NoReturn:
         _result_bool(self)
+
+    @staticmethod
+    def err() -> None:
+        return None
 
     def ok(self) -> _T:
         return self._value
@@ -70,30 +74,32 @@ def _result_bool(self: Result) -> NoReturn:
     )
 
 
-class safe_command(Generic[_E]):
-    def __init__(self, func: Callable[..., Result[None, _E]]) -> None:
+class _SafeResult(Generic[_T, _E]):
+    def __init__(
+        self, func: Callable[..., Result[_T, _E]], *args: Any, **kwargs: Any
+    ) -> None:
         self._func = func
-        self._args: Tuple[Any, ...] = ()
-        self._kwargs: Dict[str, Any] = {}
+        self._args: Tuple[Any, ...] = args
+        self._kwargs: Dict[str, Any] = kwargs
 
-        update_wrapper(self, func)
-
-    def __call__(self, *args: Any, **kwargs: Any) -> "safe_command[_E]":
-        self._args = args
-        self._kwargs = kwargs
-        return self
-
-    def error(self) -> Optional[_E]:
-        result = self._call_func()
-        if isinstance(result, Err):
-            return result.err()
-        return None
-
-    def unwrap(self) -> None:
-        return self._call_func().unwrap()
-
-    def _call_func(self) -> Result[None, _E]:
+    def result(self) -> Result[_T, _E]:
         return self._func(*self._args, **self._kwargs)
+
+    def err(self) -> Optional[_E]:
+        return self.result().err()
+
+    def unwrap(self) -> _T:
+        return self.result().unwrap()
+
+
+def return_safe_result(
+    func: Callable[..., Result[_T, _E]]
+) -> Callable[..., _SafeResult[_T, _E]]:
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> _SafeResult[_T, _E]:
+        return _SafeResult(func, *args, **kwargs)
+
+    return wrapper
 
 
 class _ErrHelper(Protocol[_E]):
