@@ -10,14 +10,12 @@ from typing import (
     NoReturn,
     Optional,
     Tuple,
-    Type,
     TypeVar,
     Union,
 )
 
 from .io import efill, ewrap
 from .meta import Inspector, cname
-from .types import Protocol
 
 
 _T = TypeVar("_T")
@@ -68,10 +66,14 @@ class Err(Generic[_E]):
 Result = Union[Ok[_T], Err[_E]]
 
 
-def _raise_bool_error(self: Result) -> NoReturn:
-    raise ValueError(
-        f"An {cname(self)} object cannot be evaluated as a boolean."
-    )
+def return_lazy_result(
+    func: Callable[..., Result[_T, _E]]
+) -> Callable[..., "_LazyResult[_T, _E]"]:
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> _LazyResult[_T, _E]:
+        return _LazyResult(func, *args, **kwargs)
+
+    return wrapper
 
 
 class _LazyResult(Generic[_T, _E]):
@@ -81,6 +83,9 @@ class _LazyResult(Generic[_T, _E]):
         self._func = func
         self._args: Tuple[Any, ...] = args
         self._kwargs: Dict[str, Any] = kwargs
+
+    def __bool__(self) -> NoReturn:
+        _raise_bool_error(self)
 
     def result(self) -> Result[_T, _E]:
         return self._func(*self._args, **self._kwargs)
@@ -92,53 +97,21 @@ class _LazyResult(Generic[_T, _E]):
         return self.result().unwrap()
 
 
-def return_lazy_result(
-    func: Callable[..., Result[_T, _E]]
-) -> Callable[..., _LazyResult[_T, _E]]:
-    @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> _LazyResult[_T, _E]:
-        return _LazyResult(func, *args, **kwargs)
-
-    return wrapper
-
-
-class _ErrHelper(Protocol[_E]):
-    def __call__(self, *args: Any, **kwargs: Any) -> Err[_E]:
-        pass
-
-
-def init_err_helper(Error: Type[_E]) -> _ErrHelper[_E]:
-    """
-    Factory function which can be used to initialize a helper function for
-    returning Err types.
-    """
-
-    def err_helper(*args: Any, **kwargs: Any) -> Err[_E]:
-        if Error is BugyiError:
-            kwargs.setdefault("up", 0)
-            kwargs["up"] += 1
-
-        e = Error(*args, **kwargs)  # type: ignore
-        return Err(e)
-
-    return err_helper
+def _raise_bool_error(self: Any) -> NoReturn:
+    raise NotImplementedError(
+        f"{cname(self)} object ({self!r}) cannot be evaluated as a boolean."
+        " This is probably a bug in your code. Make sure you are either"
+        " explicitly checking for Err results or use the `Result.unwrap()`"
+        " method."
+    )
 
 
 class BugyiError(Exception):
-    def __init__(self, emsg: str, **kwargs: Any) -> None:
-        cause = kwargs.get("cause", None)
-        assert issubclass(type(cause), (type(None), Exception))
-
-        up = kwargs.get("up", 0) + 1
-        assert up >= 1
-
-        if cause is not None and not hasattr(cause, "__cause__"):
-            chain_errors(cause, None)
-
+    def __init__(
+        self, emsg: str, cause: Exception = None, up: int = 0
+    ) -> None:
         chain_errors(self, cause)
-
-        self.inspector = Inspector(up=up)
-
+        self.inspector = Inspector(up=up + 1)
         super().__init__(emsg)
 
     def __repr__(self) -> str:
@@ -233,6 +206,9 @@ class BugyiError(Exception):
         return report
 
 
+BResult = Result[_T, BugyiError]
+
+
 class ErrorReport:
     def __init__(self, chunk: str = None, border_ch: str = "|") -> None:
         self.report_lines = []  # type: List[_ErrorReportLine]
@@ -297,8 +273,9 @@ class _ErrorReportLine:
         )
 
 
-BErr = init_err_helper(BugyiError)
-BResult = Result[_T, BugyiError]
+def BErr(emsg: str, cause: Exception = None, up: int = 0) -> Err[BugyiError]:
+    e = BugyiError(emsg, cause=cause, up=up)
+    return Err(e)
 
 
 def _tb_or_repr(e: BaseException, width: Optional[int]) -> str:
