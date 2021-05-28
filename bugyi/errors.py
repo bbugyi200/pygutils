@@ -101,7 +101,7 @@ def _raise_bool_error(self: Any) -> NoReturn:
     raise NotImplementedError(
         f"{cname(self)} object ({self!r}) cannot be evaluated as a boolean."
         " This is probably a bug in your code. Make sure you are either"
-        " explicitly checking for Err results or use the `Result.unwrap()`"
+        " explicitly checking for Err results or using the `Result.unwrap()`"
         " method."
     )
 
