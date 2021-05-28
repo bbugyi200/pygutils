@@ -117,21 +117,12 @@ class BugyiError(Exception):
     def __repr__(self) -> str:
         return self._repr()
 
-    def _repr(self, width: Optional[int] = 80) -> str:
+    def _repr(self, width: int = 80) -> str:
         """
         Format error to width.  If width is None, return string suitable for
         traceback.
         """
         super_str = super().__str__()
-
-        if width is None:
-            return 'At "{}", line {}, in {}:\n  {}\n{}'.format(
-                self.inspector.file_name,
-                self.inspector.line_number,
-                self.inspector.function_name,
-                self.inspector.lines.strip(),
-                super_str,
-            )
 
         emsg = efill(super_str, width, indent=2)
         return "{}::{}::{}::{}{{\n{}\n}}".format(
@@ -211,7 +202,7 @@ BResult = Result[_T, BugyiError]
 
 class ErrorReport:
     def __init__(self, chunk: str = None, border_ch: str = "|") -> None:
-        self.report_lines = []  # type: List[_ErrorReportLine]
+        self.report_lines: List[_ErrorReportLine] = []
         self.border_ch = border_ch
         if chunk is not None:
             self._add_chunk(chunk)
@@ -278,7 +269,7 @@ def BErr(emsg: str, cause: Exception = None, up: int = 0) -> Err[BugyiError]:
     return Err(e)
 
 
-def _tb_or_repr(e: BaseException, width: Optional[int]) -> str:
+def _tb_or_repr(e: BaseException, width: int) -> str:
     if isinstance(e, BugyiError):
         return e._repr(width=width)
     else:
