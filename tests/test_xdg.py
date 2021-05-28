@@ -29,4 +29,4 @@ def test_xdg_get(key: xdg.XDG_Type, expected: Path) -> None:
 
 def test_init_failure() -> None:
     with pytest.raises(AssertionError):
-        xdg.init("bad_key")  # type: ignore
+        xdg.init_full_dir("bad_key")  # type: ignore
