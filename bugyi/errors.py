@@ -84,11 +84,15 @@ class _LazyResult(Generic[_T, _E]):
         self._args: Tuple[Any, ...] = args
         self._kwargs: Dict[str, Any] = kwargs
 
+        self._result: Optional[Result[_T, _E]] = None
+
     def __bool__(self) -> NoReturn:
         _raise_bool_error(self)
 
     def result(self) -> Result[_T, _E]:
-        return self._func(*self._args, **self._kwargs)
+        if self._result is None:
+            self._result = self._func(*self._args, **self._kwargs)
+        return self._result
 
     def err(self) -> Optional[_E]:
         return self.result().err()
