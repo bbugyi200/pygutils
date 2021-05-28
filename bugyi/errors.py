@@ -141,9 +141,9 @@ class BugyiError(Exception):
             yield e
             e = e.__cause__
 
-    def report(self, width: int = 80) -> "ErrorReport":
+    def report(self, width: int = 80) -> "_ErrorReport":
         """
-        Return an ErrorReport object formatting the current state of this
+        Return an _ErrorReport object formatting the current state of this
         BugyiError
         """
         TITLE = cname(self)
@@ -180,8 +180,8 @@ class BugyiError(Exception):
 
         dashes = "-" * len(header)
 
-        # >>> Put everything together into a ErrorReport object.
-        report = ErrorReport("\n", border_ch=V_CH)
+        # >>> Put everything together into a _ErrorReport object.
+        report = _ErrorReport("\n", border_ch=V_CH)
         report += "{0}\n{1}\n{0}\n".format(dashes, header)
         for i, error in enumerate(reversed(list(self))):
             w = width - 2
@@ -200,7 +200,12 @@ class BugyiError(Exception):
 BResult = Result[_T, BugyiError]
 
 
-class ErrorReport:
+def BErr(emsg: str, cause: Exception = None, up: int = 0) -> Err[BugyiError]:
+    e = BugyiError(emsg, cause=cause, up=up + 1)
+    return Err(e)
+
+
+class _ErrorReport:
     def __init__(self, chunk: str = None, border_ch: str = "|") -> None:
         self.report_lines: List[_ErrorReportLine] = []
         self.border_ch = border_ch
@@ -211,7 +216,7 @@ class ErrorReport:
         self._close_borders()
         return "".join(rl.line + rl.newlines for rl in self.report_lines)
 
-    def __iadd__(self, chunk: str) -> "ErrorReport":
+    def __iadd__(self, chunk: str) -> "_ErrorReport":
         self._add_chunk(chunk)
         return self
 
@@ -262,11 +267,6 @@ class _ErrorReportLine:
         return "{}(line={!r}, newlines={!r})".format(
             cname(self), self.line, self.newlines
         )
-
-
-def BErr(emsg: str, cause: Exception = None, up: int = 0) -> Err[BugyiError]:
-    e = BugyiError(emsg, cause=cause, up=up + 1)
-    return Err(e)
 
 
 def _tb_or_repr(e: BaseException, width: int) -> str:
