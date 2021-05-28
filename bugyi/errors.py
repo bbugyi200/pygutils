@@ -60,10 +60,16 @@ class Err(Generic[_E]):
         raise self.err()
 
 
+def BErr(emsg: str, cause: Exception = None, up: int = 0) -> Err["BugyiError"]:
+    e = BugyiError(emsg, cause=cause, up=up + 1)
+    return Err(e)
+
+
 # The 'Result' return type is used to implement an error-handling model heavily
 # influenced by that used by the Rust programming language
 # (see https://doc.rust-lang.org/book/ch09-00-error-handling.html).
 Result = Union[Ok[_T], Err[_E]]
+BResult = Result[_T, "BugyiError"]
 
 
 def return_lazy_result(
@@ -199,14 +205,6 @@ class BugyiError(Exception):
 
         report += dashes
         return report
-
-
-BResult = Result[_T, BugyiError]
-
-
-def BErr(emsg: str, cause: Exception = None, up: int = 0) -> Err[BugyiError]:
-    e = BugyiError(emsg, cause=cause, up=up + 1)
-    return Err(e)
 
 
 class _ErrorReport:
