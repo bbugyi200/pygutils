@@ -32,7 +32,7 @@ class Ok(Generic[_T]):
         return f"{cname(self)}({self.ok()!r})"
 
     def __bool__(self) -> NoReturn:
-        _result_bool(self)
+        _raise_bool_error(self)
 
     @staticmethod
     def err() -> None:
@@ -53,7 +53,7 @@ class Err(Generic[_E]):
         return f"{cname(self)}(\n{efill(str(self.err()), indent=2)}\n)"
 
     def __bool__(self) -> NoReturn:
-        _result_bool(self)
+        _raise_bool_error(self)
 
     def err(self) -> _E:
         return self._e
@@ -68,7 +68,7 @@ class Err(Generic[_E]):
 Result = Union[Ok[_T], Err[_E]]
 
 
-def _result_bool(self: Result) -> NoReturn:
+def _raise_bool_error(self: Result) -> NoReturn:
     raise ValueError(
         f"An {cname(self)} object cannot be evaluated as a boolean."
     )
