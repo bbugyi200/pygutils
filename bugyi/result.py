@@ -37,8 +37,12 @@ class _ResultMixin(ABC, Generic[_T, _E]):
     def unwrap(self) -> _T:
         pass
 
+    @abstractmethod
+    def unwrap_or(self, default: _T) -> _T:
+        pass
 
-class Ok(_ResultMixin[_T, Exception]):
+
+class Ok(_ResultMixin[_T, _E]):
     def __init__(self, value: _T) -> None:
         self._value = value
 
@@ -55,8 +59,11 @@ class Ok(_ResultMixin[_T, Exception]):
     def unwrap(self) -> _T:
         return self.ok()
 
+    def unwrap_or(self, default: _T) -> _T:
+        return self.ok()
 
-class Err(_ResultMixin[None, _E]):
+
+class Err(_ResultMixin[_T, _E]):
     def __init__(self, e: _E) -> None:
         self._e = e
 
@@ -69,11 +76,14 @@ class Err(_ResultMixin[None, _E]):
     def unwrap(self) -> NoReturn:
         raise self.err()
 
+    def unwrap_or(self, default: _T) -> _T:
+        return default
+
 
 # The 'Result' return type is used to implement an error-handling model heavily
 # influenced by that used by the Rust programming language
 # (see https://doc.rust-lang.org/book/ch09-00-error-handling.html).
-Result = Union[Ok[_T], Err[_E]]
+Result = Union[Ok[_T, _E], Err[_T, _E]]
 
 
 def return_lazy_result(
@@ -106,3 +116,6 @@ class _LazyResult(_ResultMixin[_T, _E]):
 
     def unwrap(self) -> _T:
         return self.result().unwrap()
+
+    def unwrap_or(self, default: _T) -> _T:
+        return self.result().unwrap_or(default)

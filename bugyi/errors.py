@@ -13,7 +13,7 @@ BResult = Result_[_T, "BugyiError"]
 
 def BErr(
     emsg: str, cause: Exception = None, up: int = 0
-) -> Err_["BugyiError"]:
+) -> Err_[_T, "BugyiError"]:
     e = BugyiError(emsg, cause=cause, up=up + 1)
     return Err_(e)
 

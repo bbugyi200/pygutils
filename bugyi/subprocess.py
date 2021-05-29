@@ -62,7 +62,7 @@ class DoneProcess:
         self.out = "" if stdout is None else str(stdout.decode().strip())
         self.err = "" if stderr is None else str(stderr.decode().strip())
 
-    def to_error(self, *, up: int = 0) -> Err[BugyiError]:
+    def to_error(self, *, up: int = 0) -> Err[Tuple[str, str], BugyiError]:
         maybe_out = ""
         if self.out:
             maybe_out = "\n\n----- STDOUT\n{}".format(self.out)
