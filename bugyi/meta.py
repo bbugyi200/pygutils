@@ -8,7 +8,7 @@ import inspect
 from os.path import abspath, isfile, realpath
 from pathlib import Path
 import sys
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, cast
 from warnings import warn
 
 
@@ -71,7 +71,7 @@ def deprecated(func: _C, wmsg: str) -> _C:
         warn(wmsg, category=BugyiDepreciationWarning, stacklevel=2)
         return func(*args, **kwargs)
 
-    return wrapper  # type: ignore
+    return cast(_C, wrapper)
 
 
 class BugyiDepreciationWarning(Warning):
