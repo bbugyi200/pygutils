@@ -41,6 +41,10 @@ class _ResultMixin(ABC, Generic[_T, _E]):
     def unwrap_or(self, default: _T) -> _T:
         pass
 
+    @abstractmethod
+    def unwrap_or_else(self, op: Callable[[_E], _T]) -> _T:
+        pass
+
 
 class Ok(_ResultMixin[_T, _E]):
     def __init__(self, value: _T) -> None:
@@ -62,6 +66,9 @@ class Ok(_ResultMixin[_T, _E]):
     def unwrap_or(self, default: _T) -> _T:
         return self.ok()
 
+    def unwrap_or_else(self, op: Callable[[_E], _T]) -> _T:
+        return self.ok()
+
 
 class Err(_ResultMixin[_T, _E]):
     def __init__(self, e: _E) -> None:
@@ -78,6 +85,9 @@ class Err(_ResultMixin[_T, _E]):
 
     def unwrap_or(self, default: _T) -> _T:
         return default
+
+    def unwrap_or_else(self, op: Callable[[_E], _T]) -> _T:
+        return op(self.err())
 
 
 # The 'Result' return type is used to implement an error-handling model heavily
@@ -119,3 +129,6 @@ class _LazyResult(_ResultMixin[_T, _E]):
 
     def unwrap_or(self, default: _T) -> _T:
         return self.result().unwrap_or(default)
+
+    def unwrap_or_else(self, op: Callable[[_E], _T]) -> _T:
+        return self.result().unwrap_or_else(op)
