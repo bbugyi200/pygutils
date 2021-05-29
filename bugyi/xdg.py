@@ -1,8 +1,9 @@
 """XDG Utilities"""
 
+from functools import partial
 import os
 from pathlib import Path
-from typing import Callable, Dict, Tuple, TypeVar
+from typing import Any, Callable, Dict, Tuple, TypeVar
 
 from .meta import deprecated, scriptname
 from .types import Literal
@@ -60,13 +61,13 @@ def get_base_dir(xdg_type: XDG_Type) -> Path:
     return xdg_dir
 
 
-def _deprecated_func(old_name: str, func: _C) -> _C:
+def _deprecated_func(old_name: str, func: Callable, **kwargs: Any) -> Callable:
     return deprecated(
-        func,
+        partial(func, **kwargs),
         f"The '{old_name}' function is deprecated. Use the '{func.__name__}'"
         " function instead.",
     )
 
 
-init = _deprecated_func("init", init_full_dir)
+init = _deprecated_func("init", init_full_dir, up=1)
 get = _deprecated_func("get", get_base_dir)

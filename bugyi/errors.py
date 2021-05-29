@@ -26,6 +26,9 @@ class BugyiError(Exception):
         self.inspector = Inspector(up=up + 1)
         super().__init__(emsg)
 
+    def __str__(self) -> str:
+        return str(self.report())
+
     def __repr__(self) -> str:
         return self._repr()
 
