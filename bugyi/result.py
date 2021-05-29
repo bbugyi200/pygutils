@@ -20,7 +20,7 @@ _T = TypeVar("_T")
 _E = TypeVar("_E", bound=Exception)
 
 
-class _ResultMixin(Generic[_T, _E], ABC):
+class _ResultMixin(ABC, Generic[_T, _E]):
     def __bool__(self) -> NoReturn:
         raise ValueError(
             f"{cname(self)} object cannot be evaluated as a boolean. This is"
