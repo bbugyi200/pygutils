@@ -20,7 +20,7 @@ _T = TypeVar("_T")
 _E = TypeVar("_E", bound=Exception)
 
 
-class _ResultMixin(ABC):
+class _ResultMixin(Generic[_T, _E], ABC):
     def __bool__(self) -> NoReturn:
         raise ValueError(
             f"{cname(self)} object cannot be evaluated as a boolean. This is"
@@ -30,15 +30,15 @@ class _ResultMixin(ABC):
         )
 
     @abstractmethod
-    def err(self) -> Optional[Exception]:
+    def err(self) -> Optional[_E]:
         pass
 
     @abstractmethod
-    def unwrap(self) -> Any:
+    def unwrap(self) -> _T:
         pass
 
 
-class Ok(Generic[_T], _ResultMixin):
+class Ok(_ResultMixin[_T, Exception]):
     def __init__(self, value: _T) -> None:
         self._value = value
 
@@ -56,7 +56,7 @@ class Ok(Generic[_T], _ResultMixin):
         return self.ok()
 
 
-class Err(Generic[_E], _ResultMixin):
+class Err(_ResultMixin[None, _E]):
     def __init__(self, e: _E) -> None:
         self._e = e
 
@@ -86,7 +86,7 @@ def return_lazy_result(
     return wrapper
 
 
-class _LazyResult(Generic[_T, _E], _ResultMixin):
+class _LazyResult(_ResultMixin[_T, _E]):
     def __init__(
         self, func: Callable[..., Result[_T, _E]], *args: Any, **kwargs: Any
     ) -> None:
