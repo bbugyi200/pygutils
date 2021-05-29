@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from functools import wraps
 from typing import (
     Any,
@@ -12,7 +13,6 @@ from typing import (
     Union,
 )
 
-from .io import efill
 from .meta import cname
 
 
@@ -46,12 +46,9 @@ class _ResultMixin(ABC, Generic[_T, _E]):
         pass
 
 
+@dataclass
 class Ok(_ResultMixin[_T, _E]):
-    def __init__(self, value: _T) -> None:
-        self._value = value
-
-    def __repr__(self) -> str:
-        return f"{cname(self)}({self.ok()!r})"
+    _value: _T
 
     @staticmethod
     def err() -> None:
@@ -70,12 +67,9 @@ class Ok(_ResultMixin[_T, _E]):
         return self.ok()
 
 
+@dataclass
 class Err(_ResultMixin[_T, _E]):
-    def __init__(self, e: _E) -> None:
-        self._e = e
-
-    def __repr__(self) -> str:
-        return f"{cname(self)}(\n{efill(str(self.err()), indent=2)}\n)"
+    _e: _E
 
     def err(self) -> _E:
         return self._e
