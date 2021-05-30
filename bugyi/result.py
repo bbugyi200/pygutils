@@ -69,10 +69,10 @@ class Ok(_ResultMixin[_T, _E]):
 
 @dataclass
 class Err(_ResultMixin[_T, _E]):
-    _e: _E
+    _error: _E
 
     def err(self) -> _E:
-        return self._e
+        return self._error
 
     def unwrap(self) -> NoReturn:
         raise self.err()
