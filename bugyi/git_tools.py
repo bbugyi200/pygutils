@@ -15,7 +15,10 @@ def top_level_dir(cwd: str = None) -> BResult[str]:
         ["git", "rev-parse", "--show-toplevel"], cwd=cwd
     )
     if isinstance(out_err_r, Err):
-        return BErr("`git rev-parse` command failed", cause=out_err_r.err())
+        return BErr(
+            "Unable to determine the top level git directory.",
+            cause=out_err_r.err(),
+        )
     else:
         out, _err = out_err_r.ok()
         return Ok(out)
@@ -30,7 +33,9 @@ def remotes() -> BResult[List[GitRemote]]:
     """Python wrapper around the `git remote -v` command."""
     out_err_r = bsp.safe_popen(["git", "remote", "-v"])
     if isinstance(out_err_r, Err):
-        return BErr("`git remote` command failed", cause=out_err_r.err())
+        return BErr(
+            "Failed to retrieve a list of git remotes.", cause=out_err_r.err()
+        )
 
     out, _err = out_err_r.ok()
 
@@ -76,7 +81,11 @@ def checkout(branch: str, template_branch: str = None) -> BResult[None]:
         cmd_list.extend(["-b", branch, template_branch])
 
     if error := bsp.safe_popen(cmd_list, stdout=sys.stdout).err():
-        return BErr("The `git checkout` command has failed.", cause=error)
+        emsg = f"Failed to checkout {branch}"
+        if template_branch is not None:
+            emsg += f" using {template_branch} as a template"
+        emsg += "."
+        return BErr(emsg, cause=error)
 
     return Ok(None)
 
@@ -113,7 +122,7 @@ def current_branch() -> BResult[str]:
     ref_r = bsp.safe_popen(["git", "symbolic-ref", "--quiet", "HEAD"])
     if isinstance(ref_r, Err):
         return BErr(
-            "The `git symbolic-ref` command has failed.", cause=ref_r.err()
+            "Unable to determine the current git branch.", cause=ref_r.err()
         )
 
     ref, _ = ref_r.ok()
