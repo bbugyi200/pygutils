@@ -11,11 +11,9 @@ _E = TypeVar("_E", bound=Exception)
 BResult = Result[_T, "BugyiError"]
 
 
-def BErr(
-    emsg: str, cause: Exception = None, up: int = 0
-) -> Err[_T, "BugyiError"]:
-    e = BugyiError(emsg, cause=cause, up=up + 1)
-    return Err(e)
+class BErr(Err[_T, "BugyiError"]):
+    def __init__(self, emsg: str, cause: Exception = None, up: int = 0) -> None:
+        self._error = BugyiError(emsg, cause=cause, up=up + 1)
 
 
 class BugyiError(Exception):
