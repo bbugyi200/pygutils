@@ -3,19 +3,19 @@ from typing import Iterator, List, Optional, TypeVar
 
 from .io import efill, ewrap
 from .meta import Inspector, cname
-from .result import Err as Err_, Result as Result_
+from .result import Err, Result
 
 
 _T = TypeVar("_T")
 _E = TypeVar("_E", bound=Exception)
-BResult = Result_[_T, "BugyiError"]
+BResult = Result[_T, "BugyiError"]
 
 
 def BErr(
     emsg: str, cause: Exception = None, up: int = 0
-) -> Err_[_T, "BugyiError"]:
+) -> Err[_T, "BugyiError"]:
     e = BugyiError(emsg, cause=cause, up=up + 1)
-    return Err_(e)
+    return Err(e)
 
 
 class BugyiError(Exception):
