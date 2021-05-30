@@ -46,7 +46,7 @@ class _ResultMixin(ABC, Generic[_T, _E]):
         pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Ok(_ResultMixin[_T, _E]):
     _value: _T
 
@@ -67,7 +67,7 @@ class Ok(_ResultMixin[_T, _E]):
         return self.ok()
 
 
-@dataclass
+@dataclass(frozen=True)
 class Err(_ResultMixin[_T, _E]):
     _error: _E
 

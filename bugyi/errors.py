@@ -13,7 +13,8 @@ BResult = Result[_T, "BugyiError"]
 
 class BErr(Err[_T, "BugyiError"]):
     def __init__(self, emsg: str, cause: Exception = None, up: int = 0) -> None:
-        self._error = BugyiError(emsg, cause=cause, up=up + 1)
+        e = BugyiError(emsg, cause=cause, up=up + 1)
+        super().__init__(e)
 
 
 class BugyiError(Exception):
@@ -48,11 +49,8 @@ class BugyiError(Exception):
 
     def __iter__(self) -> Iterator[BaseException]:
         yield self
-
-        e = self.__cause__
-        while e:
+        while e := self.__cause__:
             yield e
-            e = e.__cause__
 
     def report(self, width: int = 80) -> "_ErrorReport":
         """
