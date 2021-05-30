@@ -25,8 +25,8 @@ class _ResultMixin(ABC, Generic[_T, _E]):
         raise ValueError(
             f"{cname(self)} object cannot be evaluated as a boolean. This is"
             " probably a bug in your code. Make sure you are either"
-            " explicitly checking for Err results or using the"
-            f" `Result.unwrap()` method: {self!r}"
+            " explicitly checking for Err results or using one of the"
+            f" `Result.unwrap*()` methods:  {self!r}"
         )
 
     @abstractmethod
