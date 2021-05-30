@@ -189,8 +189,8 @@ def _tb_or_repr(e: BaseException, width: int) -> str:
 
 
 def chain_errors(e1: _E, e2: Optional[Exception]) -> _E:
-    e = e1
-    while getattr(e, "__cause__", None):
-        e = getattr(e, "__cause__")
-    setattr(e, "__cause__", e2)
+    e: BaseException = e1
+    while cause := e.__cause__:
+        e = cause
+    e.__cause__ = e2
     return e1
