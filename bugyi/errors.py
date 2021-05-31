@@ -1,17 +1,16 @@
 import traceback
-from typing import Iterator, List, Optional, TypeVar
+from typing import Iterator, List, Optional
 
 from .io import efill, ewrap
 from .meta import Inspector, cname
 from .result import Err, Result
+from .types import E, T
 
 
-_T = TypeVar("_T")
-_E = TypeVar("_E", bound=Exception)
-BResult = Result[_T, "BugyiError"]
+BResult = Result[T, "BugyiError"]
 
 
-class BErr(Err[_T, "BugyiError"]):
+class BErr(Err[T, "BugyiError"]):
     def __init__(self, emsg: str, cause: Exception = None, up: int = 0) -> None:
         e = BugyiError(emsg, cause=cause, up=up + 1)
         super().__init__(e)
@@ -49,8 +48,11 @@ class BugyiError(Exception):
 
     def __iter__(self) -> Iterator[BaseException]:
         yield self
-        while e := self.__cause__:
+
+        e = self.__cause__
+        while e:
             yield e
+            e = e.__cause__
 
     def report(self, width: int = 80) -> "_ErrorReport":
         """
@@ -184,9 +186,11 @@ def _tb_or_repr(e: BaseException, width: int) -> str:
         return estring
 
 
-def chain_errors(e1: _E, e2: Optional[Exception]) -> _E:
+def chain_errors(e1: E, e2: Optional[Exception]) -> E:
     e: BaseException = e1
-    while cause := e.__cause__:
+    cause = e.__cause__
+    while cause:
         e = cause
+        cause = e.__cause__
     e.__cause__ = e2
     return e1

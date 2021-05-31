@@ -9,18 +9,14 @@ from typing import (
     NoReturn,
     Optional,
     Tuple,
-    TypeVar,
     Union,
 )
 
 from .meta import cname
+from .types import E, T
 
 
-_T = TypeVar("_T")
-_E = TypeVar("_E", bound=Exception)
-
-
-class _ResultMixin(ABC, Generic[_T, _E]):
+class _ResultMixin(ABC, Generic[T, E]):
     def __bool__(self) -> NoReturn:
         raise ValueError(
             f"{cname(self)} object cannot be evaluated as a boolean. This is"
@@ -30,99 +26,99 @@ class _ResultMixin(ABC, Generic[_T, _E]):
         )
 
     @abstractmethod
-    def err(self) -> Optional[_E]:
+    def err(self) -> Optional[E]:
         pass
 
     @abstractmethod
-    def unwrap(self) -> _T:
+    def unwrap(self) -> T:
         pass
 
     @abstractmethod
-    def unwrap_or(self, default: _T) -> _T:
+    def unwrap_or(self, default: T) -> T:
         pass
 
     @abstractmethod
-    def unwrap_or_else(self, op: Callable[[_E], _T]) -> _T:
+    def unwrap_or_else(self, op: Callable[[E], T]) -> T:
         pass
 
 
 @dataclass(frozen=True)
-class Ok(_ResultMixin[_T, _E]):
-    _value: _T
+class Ok(_ResultMixin[T, E]):
+    _value: T
 
     @staticmethod
     def err() -> None:
         return None
 
-    def ok(self) -> _T:
+    def ok(self) -> T:
         return self._value
 
-    def unwrap(self) -> _T:
+    def unwrap(self) -> T:
         return self.ok()
 
-    def unwrap_or(self, default: _T) -> _T:
+    def unwrap_or(self, default: T) -> T:
         return self.ok()
 
-    def unwrap_or_else(self, op: Callable[[_E], _T]) -> _T:
+    def unwrap_or_else(self, op: Callable[[E], T]) -> T:
         return self.ok()
 
 
 @dataclass(frozen=True)
-class Err(_ResultMixin[_T, _E]):
-    _error: _E
+class Err(_ResultMixin[T, E]):
+    _error: E
 
-    def err(self) -> _E:
+    def err(self) -> E:
         return self._error
 
     def unwrap(self) -> NoReturn:
         raise self.err()
 
-    def unwrap_or(self, default: _T) -> _T:
+    def unwrap_or(self, default: T) -> T:
         return default
 
-    def unwrap_or_else(self, op: Callable[[_E], _T]) -> _T:
+    def unwrap_or_else(self, op: Callable[[E], T]) -> T:
         return op(self.err())
 
 
 # The 'Result' return type is used to implement an error-handling model heavily
 # influenced by that used by the Rust programming language
 # (see https://doc.rust-lang.org/book/ch09-00-error-handling.html).
-Result = Union[Ok[_T, _E], Err[_T, _E]]
+Result = Union[Ok[T, E], Err[T, E]]
 
 
 def return_lazy_result(
-    func: Callable[..., Result[_T, _E]]
-) -> Callable[..., "_LazyResult[_T, _E]"]:
+    func: Callable[..., Result[T, E]]
+) -> Callable[..., "_LazyResult[T, E]"]:
     @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> _LazyResult[_T, _E]:
+    def wrapper(*args: Any, **kwargs: Any) -> _LazyResult[T, E]:
         return _LazyResult(func, *args, **kwargs)
 
     return wrapper
 
 
-class _LazyResult(_ResultMixin[_T, _E]):
+class _LazyResult(_ResultMixin[T, E]):
     def __init__(
-        self, func: Callable[..., Result[_T, _E]], *args: Any, **kwargs: Any
+        self, func: Callable[..., Result[T, E]], *args: Any, **kwargs: Any
     ) -> None:
         self._func = func
         self._args: Tuple[Any, ...] = args
         self._kwargs: Dict[str, Any] = kwargs
 
-        self._result: Optional[Result[_T, _E]] = None
+        self._result: Optional[Result[T, E]] = None
 
-    def result(self) -> Result[_T, _E]:
+    def result(self) -> Result[T, E]:
         if self._result is None:
             self._result = self._func(*self._args, **self._kwargs)
         return self._result
 
-    def err(self) -> Optional[_E]:
+    def err(self) -> Optional[E]:
         return self.result().err()
 
-    def unwrap(self) -> _T:
+    def unwrap(self) -> T:
         return self.result().unwrap()
 
-    def unwrap_or(self, default: _T) -> _T:
+    def unwrap_or(self, default: T) -> T:
         return self.result().unwrap_or(default)
 
-    def unwrap_or_else(self, op: Callable[[_E], _T]) -> _T:
+    def unwrap_or_else(self, op: Callable[[E], T]) -> T:
         return self.result().unwrap_or_else(op)
