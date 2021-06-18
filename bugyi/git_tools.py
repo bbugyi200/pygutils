@@ -119,11 +119,12 @@ def _git_cmd(cmd: str, *opts: str) -> BResult[None]:
 
 
 def current_branch() -> BResult[str]:
-    ref_r = bsp.safe_popen(["git", "symbolic-ref", "--quiet", "HEAD"])
-    if isinstance(ref_r, Err):
+    this_branch_r = bsp.safe_popen(["git", "branch", "--show-current"])
+    if isinstance(this_branch_r, Err):
         return BErr(
-            "Unable to determine the current git branch.", cause=ref_r.err()
+            "Unable to determine the current git branch.",
+            cause=this_branch_r.err(),
         )
 
-    ref, _ = ref_r.ok()
-    return Ok(ref.split("/")[-1])
+    this_branch, _ = this_branch_r.ok()
+    return Ok(this_branch)

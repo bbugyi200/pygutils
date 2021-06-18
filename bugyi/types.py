@@ -1,8 +1,9 @@
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Type, TypeVar, Union
+from typing import Any, Callable, Type, TypeVar, Union
 
 
+C = TypeVar("C", bound=Callable)
 E = TypeVar("E", bound=Exception)
 T = TypeVar("T")
 
