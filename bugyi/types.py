@@ -23,6 +23,7 @@ except ImportError:
     try:
         from typing_extension import Final, Literal, Protocol  # type: ignore
     except ImportError:
+
         class _FinalMock:
             def __getitem__(self, key: Type[T]) -> Type[T]:
                 return key
@@ -37,4 +38,4 @@ except ImportError:
 
 
 def assert_never(value: NoReturn) -> NoReturn:
-    assert False, f'Unhandled value: {value} ({type(value).__name__})'
+    raise AssertionError(f"Unhandled value: {value} ({type(value).__name__})")
