@@ -1,6 +1,6 @@
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Callable, Type, TypeVar, Union
+from typing import Any, Callable, NoReturn, Type, TypeVar, Union
 
 
 C = TypeVar("C", bound=Callable)
@@ -34,3 +34,7 @@ except ImportError:
         Final = _FinalMock()  # type: ignore
         Literal = defaultdict(lambda: str)  # type: ignore
         Protocol = _ProtocolMock("Protocol", (object,), {})  # type: ignore
+
+
+def assert_never(value: NoReturn) -> NoReturn:
+    assert False, f'Unhandled value: {value} ({type(value).__name__})'
