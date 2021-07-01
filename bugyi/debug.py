@@ -7,8 +7,6 @@ import traceback
 from types import FrameType
 from typing import Any, Callable
 
-import devtools
-
 
 def sigint_dump() -> None:
     """Sets up a signal handler for SIGINT that prints the stack trace."""
@@ -62,7 +60,3 @@ def trace(log: logging.Logger) -> Callable:
         return wrapper
 
     return decorator
-
-
-def debug(*args: Any) -> None:
-    devtools.debug(*args)
