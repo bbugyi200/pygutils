@@ -9,7 +9,6 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    cast,
     get_args,
 )
 
@@ -85,5 +84,5 @@ def literal_to_list(
     return result
 
 
-def literal_to_str_list(literal: Any) -> List[str]:
-    return cast(List[str], literal_to_list(literal))
+def literal_to_string_list(literal: Any) -> List[str]:
+    return [str(item) for item in literal_to_list(literal)]
