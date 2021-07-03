@@ -1,4 +1,5 @@
 from collections import defaultdict
+from enum import Enum
 from pathlib import Path
 from typing import (
     Any,
@@ -8,6 +9,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
     get_args,
 )
 
@@ -56,7 +58,9 @@ def assert_never(value: NoReturn) -> NoReturn:
     raise AssertionError(f"Unhandled value: {value} ({type(value).__name__})")
 
 
-def literal_to_list(literal: Any) -> List[str]:
+def literal_to_list(
+    literal: Any,
+) -> List[Union[None, bool, bytes, int, str, Enum]]:
     """
     Convert a typing.Literal into a list.
 
@@ -66,13 +70,20 @@ def literal_to_list(literal: Any) -> List[str]:
 
         >>> literal_to_list(Literal['a', 'b', Literal['c', 'd', Literal['e']]])
         ['a', 'b', 'c', 'd', 'e']
+
+        >>> literal_to_list(Literal['a', 'b', Literal[1, 2, Literal[None]]])
+        ['a', 'b', 1, 2, None]
     """
     result = []
 
     for arg in get_args(literal):
-        if isinstance(arg, str):
+        if arg is None or isinstance(arg, (bool, bytes, int, str, Enum)):
             result.append(arg)
         else:
             result.extend(literal_to_list(arg))
 
     return result
+
+
+def literal_to_str_list(literal: Any) -> List[str]:
+    return cast(List[str], literal_to_list(literal))
