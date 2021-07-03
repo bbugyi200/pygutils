@@ -1,6 +1,15 @@
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Callable, NoReturn, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    List,
+    NoReturn,
+    Type,
+    TypeVar,
+    Union,
+    get_args,
+)
 
 
 C = TypeVar("C", bound=Callable)
@@ -38,4 +47,32 @@ except ImportError:
 
 
 def assert_never(value: NoReturn) -> NoReturn:
+    """
+    Raises an AssertionError. This function can be used to achieve
+    exhaustiveness checking with mypy.
+
+    REFERENCE: https://hakibenita.com/python-mypy-exhaustive-checking
+    """
     raise AssertionError(f"Unhandled value: {value} ({type(value).__name__})")
+
+
+def literal_to_list(literal: Any) -> List[str]:
+    """
+    Convert a Literal into a string.
+
+    Examples:
+        >>> literal_to_list(Literal['a', 'b', 'c'])
+        ['a', 'b', 'c']
+
+        >>> literal_to_list(Literal['a', 'b', Literal['c', 'd', Literal['e']]])
+        ['a', 'b', 'c', 'd', 'e']
+    """
+    result = []
+
+    for arg in get_args(literal):
+        if isinstance(arg, str):
+            result.append(arg)
+        else:
+            result.extend(literal_to_list(arg))
+
+    return result
