@@ -58,7 +58,7 @@ def assert_never(value: NoReturn) -> NoReturn:
 
 def literal_to_list(literal: Any) -> List[str]:
     """
-    Convert a Literal into a string.
+    Convert a typing.Literal into a string.
 
     Examples:
         >>> literal_to_list(Literal['a', 'b', 'c'])
