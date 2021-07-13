@@ -1,16 +1,8 @@
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import (
-    Any,
-    Callable,
-    List,
-    NoReturn,
-    Type,
-    TypeVar,
-    Union,
-    get_args,
-)
+import sys
+from typing import Any, Callable, List, NoReturn, Type, TypeVar, Union
 
 
 C = TypeVar("C", bound=Callable)
@@ -73,6 +65,13 @@ def literal_to_list(
         >>> literal_to_list(Literal['a', 'b', Literal[1, 2, Literal[None]]])
         ['a', 'b', 1, 2, None]
     """
+    assert sys.version_info >= (3, 8), (
+        "This function cannot be called from code run by Python<3.8"
+        f" ({sys.version})."
+    )
+
+    from typing import get_args
+
     result = []
 
     for arg in get_args(literal):
@@ -82,7 +81,3 @@ def literal_to_list(
             result.extend(literal_to_list(arg))
 
     return result
-
-
-def literal_to_string_list(literal: Any) -> List[str]:
-    return [str(item) for item in literal_to_list(literal)]
