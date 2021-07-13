@@ -67,7 +67,7 @@ def _argparse_action_key(action: argparse.Action) -> str:
         return action.dest
 
 
-class _NewParser(Protocol):
+class _NewCommand(Protocol):
     def __call__(
         self,
         name: str,
@@ -78,9 +78,9 @@ class _NewParser(Protocol):
         pass
 
 
-def new_parser_factory(
+def new_command_factory(
     parser: argparse.ArgumentParser, *, dest: str = "command"
-) -> _NewParser:
+) -> _NewCommand:
     subparsers = parser.add_subparsers(dest=dest, required=True)
 
     def new_command(
