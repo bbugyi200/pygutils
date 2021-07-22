@@ -87,3 +87,14 @@ def ewrap(
 def efill(multiline_msg: str, width: int = 80, indent: int = 0) -> str:
     """A better version of textwrap.fill()."""
     return "\n".join(ewrap(multiline_msg, width, indent))
+
+
+def confirm(prompt: str) -> bool:
+    """Prompt user for 'y' or 'n' answer.
+
+    Returns:
+        True iff the user responds to the @prompt with 'y'.
+    """
+    prompt += " (y/n): "
+    y_or_n = input(prompt)
+    return y_or_n == "y"
