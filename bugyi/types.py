@@ -1,4 +1,5 @@
 from collections import defaultdict
+import datetime as dt
 from enum import Enum
 from pathlib import Path
 import sys
@@ -9,6 +10,7 @@ C = TypeVar("C", bound=Callable)
 E = TypeVar("E", bound=Exception)
 T = TypeVar("T")
 
+DateLike = Union[str, dt.date, dt.datetime]
 PathLike = Union[str, Path]
 
 # The below 'typing' module types are imported from this module by other
