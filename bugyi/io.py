@@ -98,3 +98,10 @@ def confirm(prompt: str) -> bool:
     prompt += " (y/n): "
     y_or_n = input(prompt)
     return y_or_n == "y"
+
+
+def box(title: str) -> str:
+    """Wraps @title in a pretty ASCII box."""
+    middle = f"|          {title}          |"
+    top = bottom = "+" + ("-" * (len(middle) - 2)) + "+"
+    return f"{top}\n{middle}\n{bottom}"
