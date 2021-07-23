@@ -3,13 +3,12 @@
 from functools import partial
 import os
 from pathlib import Path
-from typing import Any, Callable, Dict, Tuple, TypeVar
+from typing import Any, Callable, Dict, Tuple
 
 from .meta import deprecated, scriptname
 from .types import Literal
 
 
-_C = TypeVar("_C", bound=Callable)
 XDG_Type = Literal["cache", "config", "data", "runtime"]
 
 _home = os.environ.get("HOME")
