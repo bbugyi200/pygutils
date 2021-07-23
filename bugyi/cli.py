@@ -3,7 +3,9 @@
 import argparse
 from dataclasses import dataclass
 import inspect
-from typing import Any, Iterable, Protocol
+from typing import Any, Iterable
+
+from .types import Protocol
 
 
 @dataclass(frozen=True)
@@ -61,7 +63,8 @@ class _HelpFormatter(argparse.RawDescriptionHelpFormatter):
 
 
 def _argparse_action_key(action: argparse.Action) -> str:
-    if opts := action.option_strings:
+    opts = action.option_strings
+    if opts:
         return opts[-1].lstrip("-")
     else:
         return action.dest
