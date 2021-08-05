@@ -1,8 +1,6 @@
-from functools import partial
-
 # For accessing modules as attributes of 'bugyi' (e.g. 'bugyi.logging').
 #
-# DEPRECATED: Use `from bugyi import <MODULE>` or `from bugyi.<MODULE> import
+# DEPRECIATED: Use `from bugyi import <MODULE>` or `from bugyi.<MODULE> import
 # <NAME>` instead.
 from . import debug, io, logging, xdg
 
@@ -20,40 +18,40 @@ from .core import (
 from .subprocess import StillAliveException, create_pidfile
 from .tools import notify, xkey, xtype
 
-from .meta import deprecated
+from .meta import depreciated
 
 
-ArgumentParser = deprecated(
+ArgumentParser = depreciated(
     ArgumentParser,
     "Importing 'ArgumentParser' directly from the 'bugyi' package is"
-    " deprecated. Use 'from bugyi import cli' instead.",
+    " depreciated. Use 'from bugyi import cli' instead.",
 )
 
 _CORE_WARNING = (
     "Accessing / Importing the '{0}' function directly from the 'bugyi'"
-    " package is deprecated. Use 'from bugyi.core import {0}' instead.".format
+    " package is depreciated. Use 'from bugyi.core import {0}' instead.".format
 )
-catch = deprecated(catch, _CORE_WARNING("catch"))
-create_dir = deprecated(create_dir, _CORE_WARNING("create_dir"))
-efill = deprecated(efill, _CORE_WARNING("efill"))
-ewrap = deprecated(ewrap, _CORE_WARNING("ewrap"))
-mkfifo = deprecated(mkfifo, _CORE_WARNING("mkfifo"))
-secret = deprecated(secret, _CORE_WARNING("secret"))
-shell = deprecated(shell, _CORE_WARNING("shell"))
-signal = deprecated(signal, _CORE_WARNING("signal"))
+catch = depreciated(catch, _CORE_WARNING("catch"))
+create_dir = depreciated(create_dir, _CORE_WARNING("create_dir"))
+efill = depreciated(efill, _CORE_WARNING("efill"))
+ewrap = depreciated(ewrap, _CORE_WARNING("ewrap"))
+mkfifo = depreciated(mkfifo, _CORE_WARNING("mkfifo"))
+secret = depreciated(secret, _CORE_WARNING("secret"))
+shell = depreciated(shell, _CORE_WARNING("shell"))
+signal = depreciated(signal, _CORE_WARNING("signal"))
 
 _SUBPROCESS_WARNING = (
-    "Importing '{}' directly from the 'bugyi' package is deprecated. Use"
+    "Importing '{}' directly from the 'bugyi' package is depreciated. Use"
     " 'from bugyi import subprocess as bsp' instead.".format
 )
-create_pidfile = deprecated(
+create_pidfile = depreciated(
     create_pidfile, _SUBPROCESS_WARNING("create_pidfile")
 )
 
 _TOOLS_WARNING = (
-    "Importing '{0}' directly from the 'bugyi' package is deprecated. Use"
+    "Importing '{0}' directly from the 'bugyi' package is depreciated. Use"
     " 'from bugyi.tools import {0}' instead.".format
 )
-notify = deprecated(partial(notify, up=1), _TOOLS_WARNING("notify"))
-xkey = deprecated(xkey, _TOOLS_WARNING("xkey"))
-xtype = deprecated(xtype, _TOOLS_WARNING("xtype"))
+notify = depreciated(notify, _TOOLS_WARNING("notify"))
+xkey = depreciated(xkey, _TOOLS_WARNING("xkey"))
+xtype = depreciated(xtype, _TOOLS_WARNING("xtype"))

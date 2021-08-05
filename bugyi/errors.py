@@ -1,41 +1,116 @@
 import traceback
-from typing import Iterator, List, Optional
+from typing import (
+    Any,
+    Generic,
+    Iterator,
+    List,
+    NoReturn,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from .io import efill, ewrap
 from .meta import Inspector, cname
-from .result import Err, Result
-from .types import E, T
+from .types import Protocol
 
 
-BResult = Result[T, "BugyiError"]
+_T = TypeVar("_T")
+_E = TypeVar("_E", bound=Exception)
 
 
-class BErr(Err[T, "BugyiError"]):
-    def __init__(self, emsg: str, cause: Exception = None, up: int = 0) -> None:
-        e = BugyiError(emsg, cause=cause, up=up + 1)
-        super().__init__(e)
+class Ok(Generic[_T]):
+    def __init__(self, value: _T) -> None:
+        self._value = value
+
+    def __repr__(self) -> str:
+        return f"{cname(self)}({self.ok()!r})"
+
+    def ok(self) -> _T:
+        return self._value
+
+    def unwrap(self) -> _T:
+        return self.ok()
+
+
+class Err(Generic[_E]):
+    def __init__(self, e: _E) -> None:
+        self._e = e
+
+    def __repr__(self) -> str:
+        return f"{cname(self)}(\n{efill(str(self.err()), indent=2)}\n)"
+
+    def err(self) -> _E:
+        return self._e
+
+    def unwrap(self) -> NoReturn:
+        raise self.err()
+
+
+# The 'Result' return type is used to implement an error-handling model heavily
+# influenced by that used by the Rust programming language
+# (see https://doc.rust-lang.org/book/ch09-00-error-handling.html).
+Result = Union[Ok[_T], Err[_E]]
+
+
+class _ErrHelper(Protocol[_E]):
+    def __call__(self, *args: Any, **kwargs: Any) -> Err[_E]:
+        pass
+
+
+def init_err_helper(Error: Type[_E]) -> _ErrHelper[_E]:
+    """
+    Factory function which can be used to initialize a helper function for
+    returning Err types.
+    """
+
+    def err_helper(*args: Any, **kwargs: Any) -> Err[_E]:
+        if Error is BugyiError:
+            kwargs.setdefault("up", 0)
+            kwargs["up"] += 1
+
+        e = Error(*args, **kwargs)  # type: ignore
+        return Err(e)
+
+    return err_helper
 
 
 class BugyiError(Exception):
-    def __init__(
-        self, emsg: str, cause: Exception = None, up: int = 0
-    ) -> None:
-        chain_errors(self, cause)
-        self.inspector = Inspector(up=up + 1)
-        super().__init__(emsg)
+    def __init__(self, emsg: str, **kwargs: Any) -> None:
+        cause = kwargs.get("cause", None)
+        assert issubclass(type(cause), (type(None), Exception))
 
-    def __str__(self) -> str:
-        return str(self.report())
+        up = kwargs.get("up", 0) + 1
+        assert up >= 1
+
+        if cause is not None and not hasattr(cause, "__cause__"):
+            chain_errors(cause, None)
+
+        chain_errors(self, cause)
+
+        self.inspector = Inspector(up=up)
+
+        super().__init__(emsg)
 
     def __repr__(self) -> str:
         return self._repr()
 
-    def _repr(self, width: int = 80) -> str:
+    def _repr(self, width: Optional[int] = 80) -> str:
         """
         Format error to width.  If width is None, return string suitable for
         traceback.
         """
         super_str = super().__str__()
+
+        if width is None:
+            return 'At "{}", line {}, in {}:\n  {}\n{}'.format(
+                self.inspector.file_name,
+                self.inspector.line_number,
+                self.inspector.function_name,
+                self.inspector.lines.strip(),
+                super_str,
+            )
 
         emsg = efill(super_str, width, indent=2)
         return "{}::{}::{}::{}{{\n{}\n}}".format(
@@ -54,9 +129,9 @@ class BugyiError(Exception):
             yield e
             e = e.__cause__
 
-    def report(self, width: int = 80) -> "_ErrorReport":
+    def report(self, width: int = 80) -> "ErrorReport":
         """
-        Return an _ErrorReport object formatting the current state of this
+        Return an ErrorReport object formatting the current state of this
         BugyiError
         """
         TITLE = cname(self)
@@ -93,8 +168,8 @@ class BugyiError(Exception):
 
         dashes = "-" * len(header)
 
-        # >>> Put everything together into a _ErrorReport object.
-        report = _ErrorReport("\n", border_ch=V_CH)
+        # >>> Put everything together into a ErrorReport object.
+        report = ErrorReport("\n", border_ch=V_CH)
         report += "{0}\n{1}\n{0}\n".format(dashes, header)
         for i, error in enumerate(reversed(list(self))):
             w = width - 2
@@ -110,9 +185,9 @@ class BugyiError(Exception):
         return report
 
 
-class _ErrorReport:
+class ErrorReport:
     def __init__(self, chunk: str = None, border_ch: str = "|") -> None:
-        self.report_lines: List[_ErrorReportLine] = []
+        self.report_lines = []  # type: List[_ErrorReportLine]
         self.border_ch = border_ch
         if chunk is not None:
             self._add_chunk(chunk)
@@ -121,7 +196,7 @@ class _ErrorReport:
         self._close_borders()
         return "".join(rl.line + rl.newlines for rl in self.report_lines)
 
-    def __iadd__(self, chunk: str) -> "_ErrorReport":
+    def __iadd__(self, chunk: str) -> "ErrorReport":
         self._add_chunk(chunk)
         return self
 
@@ -174,7 +249,11 @@ class _ErrorReportLine:
         )
 
 
-def _tb_or_repr(e: BaseException, width: int) -> str:
+BErr = init_err_helper(BugyiError)
+BResult = Result[_T, BugyiError]
+
+
+def _tb_or_repr(e: BaseException, width: Optional[int]) -> str:
     if isinstance(e, BugyiError):
         return e._repr(width=width)
     else:
@@ -186,11 +265,9 @@ def _tb_or_repr(e: BaseException, width: int) -> str:
         return estring
 
 
-def chain_errors(e1: E, e2: Optional[Exception]) -> E:
-    e: BaseException = e1
-    cause = e.__cause__
-    while cause:
-        e = cause
-        cause = e.__cause__
-    e.__cause__ = e2
+def chain_errors(e1: _E, e2: Optional[Exception]) -> _E:
+    e = e1
+    while getattr(e, "__cause__", None):
+        e = getattr(e, "__cause__")
+    setattr(e, "__cause__", e2)
     return e1

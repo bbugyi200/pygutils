@@ -3,8 +3,7 @@ import subprocess as sp
 from typing import Any, Iterable, List, Tuple
 
 from . import xdg
-from .errors import BErr, BResult, BugyiError
-from .result import Err, Ok
+from .errors import BErr, BResult, BugyiError, Err, Ok
 
 
 def safe_popen(
@@ -62,7 +61,7 @@ class DoneProcess:
         self.out = "" if stdout is None else str(stdout.decode().strip())
         self.err = "" if stderr is None else str(stderr.decode().strip())
 
-    def to_error(self, *, up: int = 0) -> Err[Tuple[str, str], BugyiError]:
+    def to_error(self, *, up: int = 0) -> Err[BugyiError]:
         maybe_out = ""
         if self.out:
             maybe_out = "\n\n----- STDOUT\n{}".format(self.out)

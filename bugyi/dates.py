@@ -7,9 +7,9 @@ from .types import DateLike, assert_never
 
 
 def parse_date(date: DateLike) -> dt.date:
-    if date in ["@today", "@td"]:
+    if date in ["@today", "@t"]:
         return dt.date.today()
-    elif date in ["@yesterday", "@yd"]:
+    elif date in ["@yesterday", "@y"]:
         return dt.date.today() - dt.timedelta(days=1)
     elif isinstance(date, str):
         datetime = dateutil_parse(date)
