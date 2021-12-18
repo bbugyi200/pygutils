@@ -4,7 +4,7 @@ from distutils.core import setup
 setup(
     author="Bryan M Bugyi",
     author_email='bryanbugyi34@gmail.com',
-    install_requires=['loguru'],
+    install_requires=['devtools[pygments]', 'loguru'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

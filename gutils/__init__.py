@@ -1,4 +1,4 @@
-"""Depreciated 'gutils' package."""
+"""Deprecated 'gutils' package."""
 
 import sys
 from warnings import warn
@@ -8,11 +8,11 @@ from bugyi import *
 
 
 class GutilsDepreciationWarning(Warning):
-    """Depreciated package exception."""
+    """Deprecated package exception."""
 
 
 warn(
-    "The 'gutils' package has been depreciated. Use the 'bugyi' package"
+    "The 'gutils' package has been deprecated. Use the 'bugyi' package"
     " instead.",
     category=GutilsDepreciationWarning,
     stacklevel=2,

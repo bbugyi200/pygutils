@@ -3,7 +3,9 @@
 import argparse
 from dataclasses import dataclass
 import inspect
-from typing import Any
+from typing import Any, Iterable
+
+from .types import Protocol
 
 
 @dataclass(frozen=True)
@@ -22,6 +24,9 @@ def ArgumentParser(
             description = frame.f_globals["__doc__"]
         except KeyError:
             pass
+
+    if kwargs.get("formatter_class") is None:
+        kwargs["formatter_class"] = _HelpFormatter
 
     parser = argparse.ArgumentParser(  # type: ignore
         *args, description=description, **kwargs
@@ -44,3 +49,62 @@ def ArgumentParser(
     )
 
     return parser
+
+
+class _HelpFormatter(argparse.RawDescriptionHelpFormatter):
+    """
+    Custom argparse.HelpFormatter that uses raw descriptions and sorts optional
+    arguments alphabetically.
+    """
+
+    def add_arguments(self, actions: Iterable[argparse.Action]) -> None:
+        actions = sorted(actions, key=_argparse_action_key)
+        super().add_arguments(actions)
+
+
+def _argparse_action_key(action: argparse.Action) -> str:
+    opts = action.option_strings
+    if opts:
+        return opts[-1].lstrip("-")
+    else:
+        return action.dest
+
+
+class _NewCommand(Protocol):
+    def __call__(
+        self,
+        name: str,
+        *,
+        help: str,  # pylint: disable=redefined-builtin
+        **kwargs: Any,
+    ) -> argparse.ArgumentParser:
+        pass
+
+
+def new_command_factory(
+    parser: argparse.ArgumentParser,
+    *,
+    dest: str = "command",
+    required: bool = True,
+    description: str = None,
+    **kwargs: Any,
+) -> _NewCommand:
+    subparsers = parser.add_subparsers(
+        dest=dest, required=required, description=description, **kwargs
+    )
+
+    def new_command(
+        name: str,
+        *,
+        help: str,  # pylint: disable=redefined-builtin
+        **inner_kwargs: Any,
+    ) -> argparse.ArgumentParser:
+        return subparsers.add_parser(
+            name,
+            formatter_class=parser.formatter_class,
+            help=help,
+            description=help,
+            **inner_kwargs,
+        )
+
+    return new_command
